@@ -192,7 +192,7 @@ static uint32 GetClosestObject(TileIndex tile, ObjectType type, const Object *cu
 	FOR_ALL_OBJECTS(o) {
 		if (GetObjectType(o->location.tile) != type || o == current) continue;
 
-		best_dist = min(best_dist, DistanceManhattan(tile, o->location.tile));
+		best_dist = ::min(best_dist, DistanceManhattan(tile, o->location.tile));
 	}
 
 	return best_dist;
@@ -229,7 +229,7 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte local_id, uint32 grfid, 
 	/* If the object type is invalid, there is none and the closest is far away. */
 	if (idx >= NUM_OBJECTS) return 0 | 0xFFFF;
 
-	return Object::GetTypeCount(idx) << 16 | min(GetClosestObject(tile, idx, current), 0xFFFF);
+	return Object::GetTypeCount(idx) << 16 | ::min(GetClosestObject(tile, idx, current), 0xFFFF);
 }
 
 /** Used by the resolver to get values for feature 0F deterministic spritegroups. */
@@ -304,10 +304,10 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte local_id, uint32 grfid, 
 		case 0x44: return GetTileOwner(this->tile);
 
 		/* Get town zone and Manhattan distance of closest town */
-		case 0x45: return GetTownRadiusGroup(t, this->tile) << 16 | min(DistanceManhattan(this->tile, t->xy), 0xFFFF);
+		case 0x45: return GetTownRadiusGroup(t, this->tile) << 16 | ::min(DistanceManhattan(this->tile, t->xy), 0xFFFF);
 
 		/* Get square of Euclidian distance of closes town */
-		case 0x46: return GetTownRadiusGroup(t, this->tile) << 16 | min(DistanceSquare(this->tile, t->xy), 0xFFFF);
+		case 0x46: return GetTownRadiusGroup(t, this->tile) << 16 | ::min(DistanceSquare(this->tile, t->xy), 0xFFFF);
 
 		/* Object colour */
 		case 0x47: return this->obj->colour;

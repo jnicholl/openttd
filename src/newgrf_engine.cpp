@@ -922,8 +922,8 @@ static uint32 VehicleGetVariable(Vehicle *v, const VehicleScopeResolver *object,
 
 	if (totalsets == 0) return NULL;
 
-	uint set = (v->cargo.Count() * totalsets) / max((uint16)1, v->cargo_cap);
-	set = min(set, totalsets - 1);
+	uint set = (v->cargo.Count() * totalsets) / ::max((uint16)1, v->cargo_cap);
+	set = ::min(set, totalsets - 1);
 
 	return in_motion ? group->loaded[set] : group->loading[set];
 }

@@ -72,9 +72,9 @@ int GetTileZ(TileIndex tile)
 	if (TileX(tile) == MapMaxX() || TileY(tile) == MapMaxY()) return 0;
 
 	int h = TileHeight(tile); // N corner
-	h = min(h, TileHeight(tile + TileDiffXY(1, 0))); // W corner
-	h = min(h, TileHeight(tile + TileDiffXY(0, 1))); // E corner
-	h = min(h, TileHeight(tile + TileDiffXY(1, 1))); // S corner
+	h = ::min(h, TileHeight(tile + TileDiffXY(1, 0))); // W corner
+	h = ::min(h, TileHeight(tile + TileDiffXY(0, 1))); // E corner
+	h = ::min(h, TileHeight(tile + TileDiffXY(1, 1))); // S corner
 
 	return h;
 }
@@ -89,9 +89,9 @@ int GetTileMaxZ(TileIndex t)
 	if (TileX(t) == MapMaxX() || TileY(t) == MapMaxY()) return 0;
 
 	int h = TileHeight(t); // N corner
-	h = max<int>(h, TileHeight(t + TileDiffXY(1, 0))); // W corner
-	h = max<int>(h, TileHeight(t + TileDiffXY(0, 1))); // E corner
-	h = max<int>(h, TileHeight(t + TileDiffXY(1, 1))); // S corner
+	h = ::max<int>(h, TileHeight(t + TileDiffXY(1, 0))); // W corner
+	h = ::max<int>(h, TileHeight(t + TileDiffXY(0, 1))); // E corner
+	h = ::max<int>(h, TileHeight(t + TileDiffXY(1, 1))); // S corner
 
 	return h;
 }

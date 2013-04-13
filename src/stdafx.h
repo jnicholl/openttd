@@ -41,6 +41,10 @@
 	#endif
 #endif
 
+#if defined(__QNXNTO__)
+	using namespace std;
+#endif
+
 /* The conditions for these constants to be available are way too messy; so check them one by one */
 #if !defined(UINT64_MAX)
 	#define UINT64_MAX (18446744073709551615ULL)

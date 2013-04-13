@@ -93,7 +93,7 @@ void CheckTrainsLengths()
 			for (const Train *u = v, *w = v->Next(); w != NULL; u = w, w = w->Next()) {
 				if (u->track != TRACK_BIT_DEPOT) {
 					if ((w->track != TRACK_BIT_DEPOT &&
-							max(abs(u->x_pos - w->x_pos), abs(u->y_pos - w->y_pos)) != u->CalcNextVehicleOffset()) ||
+							::max(abs(u->x_pos - w->x_pos), abs(u->y_pos - w->y_pos)) != u->CalcNextVehicleOffset()) ||
 							(w->track == TRACK_BIT_DEPOT && TicksToLeaveDepot(u) <= 0)) {
 						SetDParam(0, v->index);
 						SetDParam(1, v->owner);
@@ -196,7 +196,7 @@ void Train::ConsistChanged(bool same_length)
 			/* max speed is the minimum of the speed limits of all vehicles in the consist */
 			if ((rvi_u->railveh_type != RAILVEH_WAGON || _settings_game.vehicle.wagon_speed_limits) && !UsesWagonOverride(u)) {
 				uint16 speed = GetVehicleProperty(u, PROP_TRAIN_SPEED, rvi_u->max_speed);
-				if (speed != 0) max_speed = min(speed, max_speed);
+				if (speed != 0) max_speed = ::min(speed, max_speed);
 			}
 		}
 
@@ -394,26 +394,26 @@ int Train::GetCurrentMaxSpeed() const
 					st_max_speed = this->cur_speed - (delta_v / 10);
 				}
 
-				st_max_speed = max(st_max_speed, 25 * distance_to_go);
-				max_speed = min(max_speed, st_max_speed);
+				st_max_speed = ::max(st_max_speed, 25 * distance_to_go);
+				max_speed = ::min(max_speed, st_max_speed);
 			}
 		}
 	}
 
 	for (const Train *u = this; u != NULL; u = u->Next()) {
 		if (_settings_game.vehicle.train_acceleration_model == AM_REALISTIC && u->track == TRACK_BIT_DEPOT) {
-			max_speed = min(max_speed, 61);
+			max_speed = ::min(max_speed, 61);
 			break;
 		}
 
 		/* Vehicle is on the middle part of a bridge. */
 		if (u->track == TRACK_BIT_WORMHOLE && !(u->vehstatus & VS_HIDDEN)) {
-			max_speed = min(max_speed, GetBridgeSpec(GetBridgeType(u->tile))->speed);
+			max_speed = ::min(max_speed, GetBridgeSpec(GetBridgeType(u->tile))->speed);
 		}
 	}
 
-	max_speed = min(max_speed, this->current_order.max_speed);
-	return min(max_speed, this->gcache.cached_max_track_speed);
+	max_speed = ::min(max_speed, this->current_order.max_speed);
+	return ::min(max_speed, this->gcache.cached_max_track_speed);
 }
 
 /** Update acceleration of the train from the cached power and weight. */
@@ -555,9 +555,9 @@ void GetTrainSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, 
 
 		/* Calculate values relative to an imaginary center between the two sprites. */
 		width = TRAININFO_DEFAULT_VEHICLE_WIDTH + UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI) + UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI) - xoffs;
-		height = max<uint>(height, UnScaleByZoom(real_sprite->height, ZOOM_LVL_GUI));
+		height = ::max<uint>(height, UnScaleByZoom(real_sprite->height, ZOOM_LVL_GUI));
 		xoffs  = xoffs - TRAININFO_DEFAULT_VEHICLE_WIDTH / 2;
-		yoffs  = min(yoffs, UnScaleByZoom(real_sprite->y_offs, ZOOM_LVL_GUI));
+		yoffs  = ::min(yoffs, UnScaleByZoom(real_sprite->y_offs, ZOOM_LVL_GUI));
 	}
 }
 

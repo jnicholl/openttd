@@ -320,7 +320,7 @@ MD5File::ChecksumResult MD5File::CheckMD5(Subdirectory subdir, size_t max_size) 
 
 	if (f == NULL) return CR_NO_FILE;
 
-	size = min(size, max_size);
+	size = ::min(size, max_size);
 
 	Md5 checksum;
 	uint8 buffer[1024];

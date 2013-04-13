@@ -321,7 +321,7 @@ IConsoleAlias *IConsoleAliasGet(const char *name)
 static inline int IConsoleCopyInParams(char *dst, const char *src, uint bufpos)
 {
 	/* len is the amount of bytes to add excluding the '\0'-termination */
-	int len = min(ICON_MAX_STREAMSIZE - bufpos - 1, (uint)strlen(src));
+	int len = ::min(ICON_MAX_STREAMSIZE - bufpos - 1, (uint)strlen(src));
 	strecpy(dst, src, dst + len);
 
 	return len;

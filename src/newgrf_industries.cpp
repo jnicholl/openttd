@@ -95,7 +95,7 @@ static uint32 GetClosestIndustry(TileIndex tile, IndustryType type, const Indust
 	FOR_ALL_INDUSTRIES(i) {
 		if (i->type != type || i == current) continue;
 
-		best_dist = min(best_dist, DistanceManhattan(tile, i->location.tile));
+		best_dist = ::min(best_dist, DistanceManhattan(tile, i->location.tile));
 	}
 
 	return best_dist;
@@ -141,14 +141,14 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte param_setID, byte layout
 		/* If the filter is 0, it could be because none was specified as well as being really a 0.
 		 * In either case, just do the regular var67 */
 		closest_dist = GetClosestIndustry(current->location.tile, ind_index, current);
-		count = min(Industry::GetIndustryTypeCount(ind_index), UINT8_MAX); // clamp to 8 bit
+		count = ::min(Industry::GetIndustryTypeCount(ind_index), UINT8_MAX); // clamp to 8 bit
 	} else {
 		/* Count only those who match the same industry type and layout filter
 		 * Unfortunately, we have to do it manually */
 		const Industry *i;
 		FOR_ALL_INDUSTRIES(i) {
 			if (i->type == ind_index && i != current && (i->selected_layout == layout_filter || layout_filter == 0) && (!town_filter || i->town == current->town)) {
-				closest_dist = min(closest_dist, DistanceManhattan(current->location.tile, i->location.tile));
+				closest_dist = ::min(closest_dist, DistanceManhattan(current->location.tile, i->location.tile));
 				count++;
 			}
 		}
@@ -182,7 +182,7 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte param_setID, byte layout
 			case 0x88: return GetTownRadiusGroup(this->industry->town, this->tile);
 
 			/* Manhattan distance of the closest town */
-			case 0x89: return min(DistanceManhattan(this->industry->town->xy, this->tile), 255);
+			case 0x89: return ::min(DistanceManhattan(this->industry->town->xy, this->tile), 255);
 
 			/* Lowest height of the tile */
 			case 0x8A: return Clamp(GetTileZ(this->tile) * (this->ro->grffile->grf_version >= 8 ? 1 : TILE_HEIGHT), 0, 0xFF);
@@ -191,7 +191,7 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte param_setID, byte layout
 			case 0x8B: return GetClosestWaterDistance(this->tile, (GetIndustrySpec(this->industry->type)->behaviour & INDUSTRYBEH_BUILT_ONWATER) == 0);
 
 			/* Square of Euclidian distance from town */
-			case 0x8D: return min(DistanceSquare(this->industry->town->xy, this->tile), 65535);
+			case 0x8D: return ::min(DistanceSquare(this->industry->town->xy, this->tile), 65535);
 
 			/* 32 random bits */
 			case 0x8F: return this->random_bits;
@@ -215,9 +215,9 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte param_setID, byte layout
 			if (HasBit(callback, CBM_IND_PRODUCTION_CARGO_ARRIVAL) || HasBit(callback, CBM_IND_PRODUCTION_256_TICKS)) {
 				if ((indspec->behaviour & INDUSTRYBEH_PROD_MULTI_HNDLING) != 0) {
 					if (this->industry->prod_level == 0) return 0;
-					return min(this->industry->incoming_cargo_waiting[variable - 0x40] / this->industry->prod_level, (uint16)0xFFFF);
+					return ::min(this->industry->incoming_cargo_waiting[variable - 0x40] / this->industry->prod_level, (uint16)0xFFFF);
 				} else {
-					return min(this->industry->incoming_cargo_waiting[variable - 0x40], (uint16)0xFFFF);
+					return ::min(this->industry->incoming_cargo_waiting[variable - 0x40], (uint16)0xFFFF);
 				}
 			} else {
 				return 0;
@@ -282,11 +282,11 @@ static uint32 GetCountAndDistanceOfClosestInstance(byte param_setID, byte layout
 		/* Get town zone and Manhattan distance of closest town */
 		case 0x65:
 			if (this->tile == INVALID_TILE) break;
-			return GetTownRadiusGroup(this->industry->town, this->tile) << 16 | min(DistanceManhattan(this->tile, this->industry->town->xy), 0xFFFF);
+			return GetTownRadiusGroup(this->industry->town, this->tile) << 16 | ::min(DistanceManhattan(this->tile, this->industry->town->xy), 0xFFFF);
 		/* Get square of Euclidian distance of closes town */
 		case 0x66:
 			if (this->tile == INVALID_TILE) break;
-			return GetTownRadiusGroup(this->industry->town, this->tile) << 16 | min(DistanceSquare(this->tile, this->industry->town->xy), 0xFFFF);
+			return GetTownRadiusGroup(this->industry->town, this->tile) << 16 | ::min(DistanceSquare(this->tile, this->industry->town->xy), 0xFFFF);
 
 		/* Count of industry, distance of closest instance
 		 * 68 is the same as 67, but with a filtering on selected layout */
@@ -604,7 +604,7 @@ void IndustryProductionCallback(Industry *ind, int reason)
 			ind->incoming_cargo_waiting[i] = Clamp(ind->incoming_cargo_waiting[i] - DerefIndProd(group->subtract_input[i], deref) * multiplier, 0, 0xFFFF);
 		}
 		for (uint i = 0; i < 2; i++) {
-			ind->produced_cargo_waiting[i] = Clamp(ind->produced_cargo_waiting[i] + max(DerefIndProd(group->add_output[i], deref), 0) * multiplier, 0, 0xFFFF);
+			ind->produced_cargo_waiting[i] = Clamp(ind->produced_cargo_waiting[i] + ::max(DerefIndProd(group->add_output[i], deref), 0) * multiplier, 0, 0xFFFF);
 		}
 
 		int32 again = DerefIndProd(group->again, deref);

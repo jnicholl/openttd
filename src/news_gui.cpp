@@ -476,7 +476,7 @@ struct NewsWindow : Window {
 	virtual void OnTick()
 	{
 		/* Scroll up newsmessages from the bottom in steps of 4 pixels */
-		int newtop = max(this->top - 4, _screen.height - this->height - this->status_height - this->chat_height);
+		int newtop = ::max(this->top - 4, _screen.height - this->height - this->status_height - this->chat_height);
 		this->SetWindowTop(newtop);
 	}
 
@@ -489,8 +489,8 @@ private:
 	{
 		if (this->top == newtop) return;
 
-		int mintop = min(newtop, this->top);
-		int maxtop = max(newtop, this->top);
+		int mintop = ::min(newtop, this->top);
+		int maxtop = ::max(newtop, this->top);
 		if (this->viewport != NULL) this->viewport->top += newtop - this->top;
 		this->top = newtop;
 
@@ -1016,7 +1016,7 @@ struct MessageHistoryWindow : Window {
 			this->date_width = GetStringBoundingBox(STR_SHORT_DATE).width;
 
 			size->height = 4 * resize->height + this->top_spacing + this->bottom_spacing; // At least 4 lines are visible.
-			size->width = max(200u, size->width); // At least 200 pixels wide.
+			size->width = ::max(200u, size->width); // At least 200 pixels wide.
 		}
 	}
 

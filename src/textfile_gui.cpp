@@ -71,7 +71,7 @@ TextfileWindow::TextfileWindow(TextfileType file_type) : Window(), file_type(fil
 			resize->height = this->line_height;
 
 			size->height = 4 * resize->height + TOP_SPACING + BOTTOM_SPACING; // At least 4 lines are visible.
-			size->width = max(200u, size->width); // At least 200 pixels wide.
+			size->width = ::max(200u, size->width); // At least 200 pixels wide.
 			break;
 	}
 }
@@ -188,7 +188,7 @@ TextfileWindow::TextfileWindow(TextfileType file_type) : Window(), file_type(fil
 
 	this->max_length = 0;
 	for (uint i = 0; i < this->lines.Length(); i++) {
-		this->max_length = max(this->max_length, GetStringBoundingBox(this->lines[i], FS_MONO).width);
+		this->max_length = ::max(this->max_length, GetStringBoundingBox(this->lines[i], FS_MONO).width);
 	}
 	this->hscroll->SetCount(this->max_length + WD_FRAMETEXT_LEFT + WD_FRAMETEXT_RIGHT);
 	this->hscroll->SetStepSize(10); // Speed up horizontal scrollbar

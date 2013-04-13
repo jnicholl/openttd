@@ -267,8 +267,8 @@ static void ParseResolution(Dimension *res, const char *s)
 		return;
 	}
 
-	res->width  = max(strtoul(s, NULL, 0), 64UL);
-	res->height = max(strtoul(t + 1, NULL, 0), 64UL);
+	res->width  = ::max(strtoul(s, NULL, 0), 64UL);
+	res->height = ::max(strtoul(t + 1, NULL, 0), 64UL);
 }
 
 

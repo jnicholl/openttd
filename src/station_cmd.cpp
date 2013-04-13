@@ -461,11 +461,11 @@ CargoArray GetProductionAroundTiles(TileIndex tile, int w, int h, int rad)
 
 	/* expand the region by rad tiles on each side
 	 * while making sure that we remain inside the board. */
-	int x2 = min(x + w + rad, MapSizeX());
-	int x1 = max(x - rad, 0);
+	int x2 = ::min(x + w + rad, MapSizeX());
+	int x1 = ::max(x - rad, 0);
 
-	int y2 = min(y + h + rad, MapSizeY());
-	int y1 = max(y - rad, 0);
+	int y2 = ::min(y + h + rad, MapSizeY());
+	int y1 = ::max(y - rad, 0);
 
 	assert(x1 < x2);
 	assert(y1 < y2);
@@ -515,10 +515,10 @@ CargoArray GetAcceptanceAroundTiles(TileIndex tile, int w, int h, int rad, uint3
 
 	/* expand the region by rad tiles on each side
 	 * while making sure that we remain inside the board. */
-	int x2 = min(x + w + rad, MapSizeX());
-	int y2 = min(y + h + rad, MapSizeY());
-	int x1 = max(x - rad, 0);
-	int y1 = max(y - rad, 0);
+	int x2 = ::min(x + w + rad, MapSizeX());
+	int y2 = ::min(y + h + rad, MapSizeY());
+	int x1 = ::max(x - rad, 0);
+	int y1 = ::max(y - rad, 0);
 
 	assert(x1 < x2);
 	assert(y1 < y2);
@@ -559,7 +559,7 @@ void UpdateStationAcceptance(Station *st, bool show_msg)
 
 	/* Adjust in case our station only accepts fewer kinds of goods */
 	for (CargoID i = 0; i < NUM_CARGO; i++) {
-		uint amt = min(acceptance[i], 15);
+		uint amt = ::min(acceptance[i], 15);
 
 		/* Make sure the station can accept the goods type. */
 		bool is_passengers = IsCargoInClass(i, CC_PASSENGERS);
@@ -967,10 +967,10 @@ CommandCost CanExpandRailStation(const BaseStation *st, TileArea &new_ta, Axis a
 	TileArea cur_ta = st->train_station;
 
 	/* determine new size of train station region.. */
-	int x = min(TileX(cur_ta.tile), TileX(new_ta.tile));
-	int y = min(TileY(cur_ta.tile), TileY(new_ta.tile));
-	new_ta.w = max(TileX(cur_ta.tile) + cur_ta.w, TileX(new_ta.tile) + new_ta.w) - x;
-	new_ta.h = max(TileY(cur_ta.tile) + cur_ta.h, TileY(new_ta.tile) + new_ta.h) - y;
+	int x = ::min(TileX(cur_ta.tile), TileX(new_ta.tile));
+	int y = ::min(TileY(cur_ta.tile), TileY(new_ta.tile));
+	new_ta.w = ::max(TileX(cur_ta.tile) + cur_ta.w, TileX(new_ta.tile) + new_ta.w) - x;
+	new_ta.h = ::max(TileY(cur_ta.tile) + cur_ta.h, TileY(new_ta.tile) + new_ta.h) - y;
 	new_ta.tile = TileXY(x, y);
 
 	/* make sure the final size is not too big. */
@@ -2055,7 +2055,7 @@ static uint GetMinimalAirportDistanceToTile(TileIterator &it, TileIndex town_til
 	uint mindist = UINT_MAX;
 
 	for (TileIndex cur_tile = it; cur_tile != INVALID_TILE; cur_tile = ++it) {
-		mindist = min(mindist, DistanceManhattan(town_tile, cur_tile));
+		mindist = ::min(mindist, DistanceManhattan(town_tile, cur_tile));
 	}
 
 	return mindist;
@@ -3127,7 +3127,7 @@ static VehicleEnterTileStatus VehicleEnter_Station(Vehicle *v, TileIndex tile, i
 				uint16 spd;
 
 				v->vehstatus |= VS_TRAIN_SLOWING;
-				spd = max(0, (stop - x) * 20 - 15);
+				spd = ::max(0, (stop - x) * 20 - 15);
 				if (spd < v->cur_speed) v->cur_speed = spd;
 			}
 		}
@@ -3234,7 +3234,7 @@ static void UpdateStationRating(Station *st)
 				/* NewGRFs expect last speed to be 0xFF when no vehicle has arrived yet. */
 				uint last_speed = ge->HasVehicleEverTriedLoading() ? ge->last_speed : 0xFF;
 
-				uint32 var18 = min(ge->time_since_pickup, 0xFF) | (min(waiting, 0xFFFF) << 8) | (min(last_speed, 0xFF) << 24);
+				uint32 var18 = ::min(ge->time_since_pickup, 0xFF) | (::min(waiting, 0xFFFF) << 8) | (::min(last_speed, 0xFF) << 24);
 				/* Convert to the 'old' vehicle types */
 				uint32 var10 = (st->last_vehicle_type == VEH_INVALID) ? 0x0 : (st->last_vehicle_type + 0x10);
 				uint16 callback = GetCargoCallback(CBID_CARGO_STATION_RATING_CALC, var10, var18, cs);
@@ -3295,7 +3295,7 @@ static void UpdateStationRating(Station *st)
 					uint32 r = Random();
 					if (rating <= (int)GB(r, 0, 7)) {
 						/* Need to have int, otherwise it will just overflow etc. */
-						waiting = max((int)waiting - (int)GB(r, 8, 2) - 1, 0);
+						waiting = ::max((int)waiting - (int)GB(r, 8, 2) - 1, 0);
 						waiting_changed = true;
 					}
 				}
@@ -3311,7 +3311,7 @@ static void UpdateStationRating(Station *st)
 					uint difference = waiting - WAITING_CARGO_THRESHOLD;
 					waiting -= (difference / WAITING_CARGO_CUT_FACTOR);
 
-					waiting = min(waiting, MAX_WAITING_CARGO);
+					waiting = ::min(waiting, MAX_WAITING_CARGO);
 					waiting_changed = true;
 				}
 

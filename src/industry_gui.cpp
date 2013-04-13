@@ -845,7 +845,7 @@ public:
 						case EA_MULTIPLIER:
 							if (button == 1) {
 								if (i->prod_level <= PRODLEVEL_MINIMUM) return;
-								i->prod_level = max<uint>(i->prod_level / 2, PRODLEVEL_MINIMUM);
+								i->prod_level = ::max<uint>(i->prod_level / 2, PRODLEVEL_MINIMUM);
 							} else {
 								if (i->prod_level >= PRODLEVEL_MAXIMUM) return;
 								i->prod_level = minu(i->prod_level * 2, PRODLEVEL_MAXIMUM);
@@ -855,7 +855,7 @@ public:
 						case EA_RATE:
 							if (button == 1) {
 								if (i->production_rate[line - IL_RATE1] <= 0) return;
-								i->production_rate[line - IL_RATE1] = max(i->production_rate[line - IL_RATE1] / 2, 0);
+								i->production_rate[line - IL_RATE1] = ::max(i->production_rate[line - IL_RATE1] / 2, 0);
 							} else {
 								if (i->production_rate[line - IL_RATE1] >= 255) return;
 								/* a zero production industry is unlikely to give anything but zero, so push it a little bit */
@@ -2057,7 +2057,7 @@ struct IndustryCargoesWindow : public Window {
 			if (!indsp->enabled) continue;
 			this->ind_textsize = maxdim(this->ind_textsize, GetStringBoundingBox(indsp->name));
 		}
-		d.width = max(d.width, this->ind_textsize.width);
+		d.width = ::max(d.width, this->ind_textsize.width);
 		d.height = this->ind_textsize.height;
 		this->ind_textsize = maxdim(this->ind_textsize, GetStringBoundingBox(STR_INDUSTRY_CARGOES_SELECT_INDUSTRY));
 
@@ -2075,7 +2075,7 @@ struct IndustryCargoesWindow : public Window {
 		d.width  += 2 * HOR_TEXT_PADDING;
 		/* Ensure the height is enough for the industry type text, for the horizontal connections, and for the cargo labels. */
 		uint min_ind_height = CargoesField::VERT_CARGO_EDGE * 2 + MAX_CARGOES * FONT_HEIGHT_NORMAL + (MAX_CARGOES - 1) *  CargoesField::VERT_CARGO_SPACE;
-		d.height = max(d.height + 2 * VERT_TEXT_PADDING, min_ind_height);
+		d.height = ::max(d.height + 2 * VERT_TEXT_PADDING, min_ind_height);
 
 		CargoesField::industry_width = d.width;
 		CargoesField::normal_height = d.height + CargoesField::VERT_INTER_INDUSTRY_SPACE;
@@ -2089,11 +2089,11 @@ struct IndustryCargoesWindow : public Window {
 				break;
 
 			case WID_IC_IND_DROPDOWN:
-				size->width = max(size->width, this->ind_textsize.width + padding.width);
+				size->width = ::max(size->width, this->ind_textsize.width + padding.width);
 				break;
 
 			case WID_IC_CARGO_DROPDOWN:
-				size->width = max(size->width, this->cargo_textsize.width + padding.width);
+				size->width = ::max(size->width, this->cargo_textsize.width + padding.width);
 				break;
 		}
 	}
@@ -2289,7 +2289,7 @@ struct IndustryCargoesWindow : public Window {
 		/* Make a field consisting of two cargo columns. */
 		int num_supp = CountMatchingProducingIndustries(central_sp->accepts_cargo, lengthof(central_sp->accepts_cargo)) + houses_supply;
 		int num_cust = CountMatchingAcceptingIndustries(central_sp->produced_cargo, lengthof(central_sp->produced_cargo)) + houses_accept;
-		int num_indrows = max(3, max(num_supp, num_cust)); // One is needed for the 'it' industry, and 2 for the cargo labels.
+		int num_indrows = ::max(3, ::max(num_supp, num_cust)); // One is needed for the 'it' industry, and 2 for the cargo labels.
 		for (int i = 0; i < num_indrows; i++) {
 			CargoesRow *row = this->fields.Append();
 			row->columns[0].MakeEmpty(CFT_EMPTY);
@@ -2365,7 +2365,7 @@ struct IndustryCargoesWindow : public Window {
 		bool houses_accept = HousesCanAccept(&cid, 1);
 		int num_supp = CountMatchingProducingIndustries(&cid, 1) + houses_supply + 1; // Ensure room for the cargo label.
 		int num_cust = CountMatchingAcceptingIndustries(&cid, 1) + houses_accept;
-		int num_indrows = max(num_supp, num_cust);
+		int num_indrows = ::max(num_supp, num_cust);
 		for (int i = 0; i < num_indrows; i++) {
 			CargoesRow *row = this->fields.Append();
 			row->columns[0].MakeEmpty(CFT_EMPTY);

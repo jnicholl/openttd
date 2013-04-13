@@ -54,10 +54,10 @@ void TileArea::Add(TileIndex to_add)
 	uint ax = TileX(to_add);
 	uint ay = TileY(to_add);
 
-	sx = min(ax, sx);
-	sy = min(ay, sy);
-	ex = max(ax, ex);
-	ey = max(ay, ey);
+	sx = ::min(ax, sx);
+	sy = ::min(ay, sy);
+	ex = ::max(ax, ex);
+	ey = ::max(ay, ey);
 
 	this->tile = TileXY(sx, sy);
 	this->w    = ex - sx + 1;
@@ -118,8 +118,8 @@ bool TileArea::Contains(TileIndex tile) const
 void TileArea::ClampToMap()
 {
 	assert(this->tile < MapSize());
-	this->w = min(this->w, MapSizeX() - TileX(this->tile));
-	this->h = min(this->h, MapSizeY() - TileY(this->tile));
+	this->w = ::min(this->w, MapSizeX() - TileX(this->tile));
+	this->h = ::min(this->h, MapSizeY() - TileY(this->tile));
 }
 
 /**
@@ -173,9 +173,9 @@ TileIterator &DiagonalTileIterator::operator++()
 			/* Special case: Every second column has zero length, skip them completely */
 			this->a_cur = 0;
 			if (this->b_max > 0) {
-				this->b_cur = min(this->b_cur + 2, this->b_max);
+				this->b_cur = ::min(this->b_cur + 2, this->b_max);
 			} else {
-				this->b_cur = max(this->b_cur - 2, this->b_max);
+				this->b_cur = ::max(this->b_cur - 2, this->b_max);
 			}
 		} else {
 			/* Every column has at least one tile to process */

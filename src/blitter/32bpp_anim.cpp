@@ -68,7 +68,7 @@ inline void Blitter_32bppAnim::Draw(const Blitter::BlitterParams *bp, ZoomLevel 
 					dst = dst_end - bp->skip_left;
 					dst_end = dst + bp->width;
 
-					n = min<uint>(n - d, (uint)bp->width);
+					n = ::min<uint>(n - d, (uint)bp->width);
 					goto draw;
 				}
 				dst += n;
@@ -83,7 +83,7 @@ inline void Blitter_32bppAnim::Draw(const Blitter::BlitterParams *bp, ZoomLevel 
 		dst_end += bp->width;
 
 		while (dst < dst_end) {
-			n = min<uint>(*src_n++, (uint)(dst_end - dst));
+			n = ::min<uint>(*src_n++, (uint)(dst_end - dst));
 
 			if (src_px->a == 0) {
 				anim += n;

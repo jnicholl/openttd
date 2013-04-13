@@ -115,7 +115,7 @@ Sprite *Blitter_32bppSimple::Encode(SpriteLoader::Sprite *sprite, AllocatorProc 
 			dst[i].v = 0;
 		} else {
 			/* Get brightest value */
-			uint8 rgb_max = max(src->r, max(src->g, src->b));
+			uint8 rgb_max = ::max(src->r, ::max(src->g, src->b));
 
 			/* Black pixel (8bpp or old 32bpp image), so use default value */
 			if (rgb_max == 0) rgb_max = DEFAULT_BRIGHTNESS;

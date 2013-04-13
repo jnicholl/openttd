@@ -26,6 +26,10 @@
 #include "sdl_v.h"
 #include <SDL.h>
 
+#ifdef __QNXNTO__
+#include <screen/screen.h>
+#endif
+
 static FVideoDriver_SDL iFVideoDriver_SDL;
 
 static SDL_Surface *_sdl_screen;
@@ -201,6 +205,32 @@ static const Dimension _default_resolutions[] = {
 
 static void GetVideoModes()
 {
+#ifdef __QNXNTO__
+	screen_context_t context;
+	int displayCount;
+
+	screen_create_context(&context, 0);
+	screen_get_context_property_iv(context, SCREEN_PROPERTY_DISPLAY_COUNT, &displayCount);
+	screen_display_t displays[displayCount];
+	screen_get_context_property_pv(context, SCREEN_PROPERTY_DISPLAYS, (void**)displays);
+	int resolution[2];
+	screen_get_display_property_iv(displays[0], SCREEN_PROPERTY_SIZE, resolution);
+	if (resolution[0] <= 0 || resolution[1] <= 0) {
+		fprintf(stderr, "Error: Failed to find screen resolution, attempting 1024x600.\n");
+		resolution[0] = 1024;
+		resolution[1] = 600;
+	}
+	if (resolution[1] > resolution[0]) {
+		int tmp = resolution[1];
+		resolution[1] = resolution[0];
+		resolution[0] = tmp;
+	}
+	_resolutions[0].width = resolution[0] * 5 / 8;
+	_resolutions[0].height = resolution[1] * 5 / 8;
+	_num_resolutions = 1;
+	screen_destroy_context(context);
+
+#else
 	SDL_Rect **modes = SDL_CALL SDL_ListModes(NULL, SDL_SWSURFACE | SDL_FULLSCREEN);
 	if (modes == NULL) usererror("sdl: no modes available");
 
@@ -233,6 +263,7 @@ static void GetVideoModes()
 		_num_resolutions = n;
 		SortResolutions(_num_resolutions);
 	}
+#endif
 }
 
 static void GetAvailableVideoMode(uint *w, uint *h)
@@ -616,8 +647,8 @@ int VideoDriver_SDL::PollEvent()
 			break;
 
 		case SDL_VIDEORESIZE: {
-			int w = max(ev.resize.w, 64);
-			int h = max(ev.resize.h, 64);
+			int w = ::max(ev.resize.w, 64);
+			int h = ::max(ev.resize.h, 64);
 			CreateMainSurface(w, h);
 			break;
 		}

@@ -377,7 +377,7 @@ struct UnmappedChoiceList : ZeroedMemoryAllocator {
 				const char *str = this->strings[this->strings.Contains(idx) ? idx : 0];
 				/* Limit the length of the string we copy to 0xFE. The length is written above
 				 * as a byte and we need room for the final '\0'. */
-				size_t len = min<size_t>(0xFE, strlen(str));
+				size_t len = ::min<size_t>(0xFE, strlen(str));
 				memcpy(d, str, len);
 				d += len;
 				*d++ = '\0';
@@ -1063,7 +1063,7 @@ uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const 
 
 			case SCC_NEWGRF_ROTATE_TOP_4_WORDS:     _newgrf_textrefstack.RotateTop4Words(); break;
 			case SCC_NEWGRF_PUSH_WORD:              _newgrf_textrefstack.PushWord(Utf8Consume(str)); break;
-			case SCC_NEWGRF_UNPRINT:                *buff = max(*buff - Utf8Consume(str), buf_start); break;
+			case SCC_NEWGRF_UNPRINT:                *buff = ::max(*buff - Utf8Consume(str), buf_start); break;
 
 			case SCC_NEWGRF_PRINT_WORD_STRING_ID:
 				*argv = TTDPStringIDToOTTDStringIDMapping(_newgrf_textrefstack.PopUnsignedWord());

@@ -38,7 +38,7 @@ void GroundVehicle<T, Type>::PowerChanged()
 
 		/* Get minimum max speed for this track. */
 		uint16 track_speed = u->GetMaxTrackSpeed();
-		if (track_speed > 0) max_track_speed = min(max_track_speed, track_speed);
+		if (track_speed > 0) max_track_speed = ::min(max_track_speed, track_speed);
 	}
 
 	byte air_drag;
@@ -48,7 +48,7 @@ void GroundVehicle<T, Type>::PowerChanged()
 	if (air_drag_value == 0) {
 		uint16 max_speed = v->GetDisplayMaxSpeed();
 		/* Simplification of the method used in TTDPatch. It uses <= 10 to change more steadily from 128 to 196. */
-		air_drag = (max_speed <= 10) ? 192 : max(2048 / max_speed, 1);
+		air_drag = (max_speed <= 10) ? 192 : ::max(2048 / max_speed, 1);
 	} else {
 		/* According to the specs, a value of 0x01 in the air drag property means "no air drag". */
 		air_drag = (air_drag_value == 1) ? 0 : air_drag_value;
@@ -89,7 +89,7 @@ void GroundVehicle<T, Type>::CargoChanged()
 	}
 
 	/* Store consist weight in cache. */
-	this->gcache.cached_weight = max<uint32>(1, weight);
+	this->gcache.cached_weight = ::max<uint32>(1, weight);
 	/* Friction in bearings and other mechanical parts is 0.1% of the weight (result in N). */
 	this->gcache.cached_axle_resistance = 10 * weight;
 
@@ -145,8 +145,8 @@ int GroundVehicle<T, Type>::GetAcceleration() const
 		}
 	} else {
 		/* "Kickoff" acceleration. */
-		force = (mode == AS_ACCEL && !maglev) ? min(max_te, power) : power;
-		force = max(force, (mass * 8) + resistance);
+		force = (mode == AS_ACCEL && !maglev) ? ::min(max_te, power) : power;
+		force = ::max(force, (mass * 8) + resistance);
 	}
 
 	if (mode == AS_ACCEL) {
@@ -159,9 +159,9 @@ int GroundVehicle<T, Type>::GetAcceleration() const
 		 * a hill will never speed up enough to (eventually) get back to the
 		 * same (maximum) speed. */
 		int accel = (force - resistance) / (mass * 4);
-		return force < resistance ? min(-1, accel) : max(1, accel);
+		return force < resistance ? ::min(-1, accel) : ::max(1, accel);
 	} else {
-		return min(-force - resistance, -10000) / mass;
+		return ::min(-force - resistance, -10000) / mass;
 	}
 }
 

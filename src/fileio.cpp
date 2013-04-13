@@ -142,7 +142,7 @@ byte FioReadByte()
 void FioSkipBytes(int n)
 {
 	for (;;) {
-		int m = min(_fio.buffer_end - _fio.buffer, n);
+		int m = ::min(_fio.buffer_end - _fio.buffer, n);
 		_fio.buffer += m;
 		n -= m;
 		if (n == 0) break;
@@ -974,7 +974,7 @@ bool ExtractTar(const char *tar_filename, Subdirectory subdir)
 		char buffer[4096];
 		size_t read;
 		for (; to_copy != 0; to_copy -= read) {
-			read = fread(buffer, 1, min(to_copy, lengthof(buffer)), in);
+			read = fread(buffer, 1, ::min(to_copy, lengthof(buffer)), in);
 			if (read <= 0 || fwrite(buffer, 1, read, out) != read) break;
 		}
 
@@ -1071,9 +1071,13 @@ bool DoScanWorkingDirectory()
 void DetermineBasePaths(const char *exe)
 {
 	char tmp[MAX_PATH];
-#if defined(__MORPHOS__) || defined(__AMIGA__) || defined(DOS) || defined(OS2) || !defined(WITH_PERSONAL_DIR)
+#if defined(__QNXNTO__)
+	// JEREMY: Store the personal dir in /accounts/1000/appdata/<GUID>/data
+	snprintf(tmp, MAX_PATH, "." PATHSEP "data");
+	AppendPathSeparator(tmp, MAX_PATH);
+	_searchpaths[SP_PERSONAL_DIR] = strdup(tmp);
+#elif defined(__MORPHOS__) || defined(__AMIGA__) || defined(DOS) || defined(OS2) || !defined(WITH_PERSONAL_DIR)
 	_searchpaths[SP_PERSONAL_DIR] = NULL;
-#else
 #ifdef __HAIKU__
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -1129,6 +1133,11 @@ void DetermineBasePaths(const char *exe)
 
 #if defined(__MORPHOS__) || defined(__AMIGA__) || defined(DOS) || defined(OS2)
 	_searchpaths[SP_INSTALLATION_DIR] = NULL;
+#elif defined(__QNXNTO__)
+	// JEREMY: Relative to our current directory, the app is installed in app/native.
+	snprintf(tmp, MAX_PATH, "app/native");
+	AppendPathSeparator(tmp, MAX_PATH);
+	_searchpaths[SP_INSTALLATION_DIR] = strdup(tmp);
 #else
 	snprintf(tmp, MAX_PATH, "%s", GLOBAL_DATA_DIR);
 	AppendPathSeparator(tmp, MAX_PATH);
@@ -1198,7 +1207,8 @@ void DeterminePaths(const char *exe)
 	_hotkeys_file = str_fmt("%shotkeys.cfg",  _personal_dir);
 
 	/* Make the necessary folders */
-#if !defined(__MORPHOS__) && !defined(__AMIGA__) && defined(WITH_PERSONAL_DIR)
+#if defined(__QNXNTO__) || !defined(__MORPHOS__) && !defined(__AMIGA__) && defined(WITH_PERSONAL_DIR)
+	// JEREMY: Do we need to create the personal directory?
 	FioCreateDirectory(_personal_dir);
 #endif
 

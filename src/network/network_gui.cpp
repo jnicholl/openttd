@@ -123,7 +123,7 @@ public:
 		/* First initialise some variables... */
 		for (NWidgetBase *child_wid = this->head; child_wid != NULL; child_wid = child_wid->next) {
 			child_wid->SetupSmallestSize(w, init_array);
-			this->smallest_y = max(this->smallest_y, child_wid->smallest_y + child_wid->padding_top + child_wid->padding_bottom);
+			this->smallest_y = ::max(this->smallest_y, child_wid->smallest_y + child_wid->padding_top + child_wid->padding_bottom);
 		}
 
 		/* ... then in a second pass make sure the 'current' sizes are set. Won't change for most widgets. */
@@ -544,7 +544,7 @@ public:
 			case WID_NG_MATRIX: {
 				uint16 y = r.top + WD_MATRIX_TOP;
 
-				const int max = min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), (int)this->servers.Length());
+				const int max = ::min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), (int)this->servers.Length());
 
 				for (int i = this->vscroll->GetPosition(); i < max; ++i) {
 					const NetworkGameList *ngl = this->servers[i];
@@ -819,7 +819,7 @@ public:
 				case WKC_PAGEDOWN:
 					/* scroll down a page */
 					if (this->list_pos == SLP_INVALID) return ES_HANDLED;
-					this->list_pos = min(this->list_pos + this->vscroll->GetCapacity(), (int)this->servers.Length() - 1);
+					this->list_pos = ::min(this->list_pos + this->vscroll->GetCapacity(), (int)this->servers.Length() - 1);
 					break;
 				case WKC_HOME:
 					/* jump to beginning */
@@ -909,7 +909,7 @@ GUIGameServerList::FilterFunction * const NetworkGameWindow::filter_funcs[] = {
 
 static NWidgetBase *MakeResizableHeader(int *biggest_index)
 {
-	*biggest_index = max<int>(*biggest_index, WID_NG_INFO);
+	*biggest_index = ::max<int>(*biggest_index, WID_NG_INFO);
 	return new NWidgetServerListHeader();
 }
 
@@ -1301,7 +1301,11 @@ static const NWidgetPart _nested_network_start_server_window_widgets[] = {
 
 			/* 'generate game' and 'load game' buttons */
 			NWidget(NWID_HORIZONTAL, NC_EQUALSIZE), SetPIP(10, 6, 10),
+#if defined(__QNXNTO__)
+				NWidget(WWT_PUSHTXTBTN, COLOUR_WHITE, WID_NSS_GENERATE_GAME), SetDataTip(STR_INTRO_NEW_GAME, STR_NULL), SetFill(1, 0),
+#else
 				NWidget(WWT_PUSHTXTBTN, COLOUR_WHITE, WID_NSS_GENERATE_GAME), SetDataTip(STR_INTRO_NEW_GAME, STR_INTRO_TOOLTIP_NEW_GAME), SetFill(1, 0),
+#endif
 				NWidget(WWT_PUSHTXTBTN, COLOUR_WHITE, WID_NSS_LOAD_GAME), SetDataTip(STR_INTRO_LOAD_GAME, STR_INTRO_TOOLTIP_LOAD_GAME), SetFill(1, 0),
 			EndContainer(),
 
@@ -1885,13 +1889,13 @@ struct NetworkClientListWindow : Window {
 	{
 		if (widget != WID_CL_PANEL) return;
 
-		this->server_client_width = max(GetStringBoundingBox(STR_NETWORK_SERVER).width, GetStringBoundingBox(STR_NETWORK_CLIENT).width) + WD_FRAMERECT_RIGHT;
+		this->server_client_width = ::max(GetStringBoundingBox(STR_NETWORK_SERVER).width, GetStringBoundingBox(STR_NETWORK_CLIENT).width) + WD_FRAMERECT_RIGHT;
 		this->company_icon_width = GetSpriteSize(SPR_COMPANY_ICON).width + WD_FRAMERECT_LEFT;
 
 		uint width = 100; // Default width
 		const NetworkClientInfo *ci;
 		FOR_ALL_CLIENT_INFOS(ci) {
-			width = max(width, GetStringBoundingBox(ci->client_name).width);
+			width = ::max(width, GetStringBoundingBox(ci->client_name).width);
 		}
 
 		size->width = WD_FRAMERECT_LEFT + this->server_client_width + this->company_icon_width + width + WD_FRAMERECT_RIGHT;
@@ -2051,18 +2055,18 @@ struct NetworkJoinStatusWindow : Window {
 		/* Account for the statuses */
 		uint width = 0;
 		for (uint i = 0; i < NETWORK_JOIN_STATUS_END; i++) {
-			width = max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_1 + i).width);
+			width = ::max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_1 + i).width);
 		}
 
 		/* For the number of waiting (other) players */
 		SetDParamMaxValue(0, MAX_CLIENTS);
-		width = max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_WAITING).width);
+		width = ::max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_WAITING).width);
 
 		/* Account for downloading ~ 10 MiB */
 		SetDParamMaxDigits(0, 8);
 		SetDParamMaxDigits(1, 8);
-		width = max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_DOWNLOADING_1).width);
-		width = max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_DOWNLOADING_2).width);
+		width = ::max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_DOWNLOADING_1).width);
+		width = ::max(width, GetStringBoundingBox(STR_NETWORK_CONNECTING_DOWNLOADING_2).width);
 
 		/* Give a bit more clearing for the widest strings than strictly needed */
 		size->width = width + WD_FRAMERECT_LEFT + WD_FRAMERECT_BOTTOM + 10;

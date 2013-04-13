@@ -246,8 +246,8 @@ protected:
 
 		CargoID j;
 		FOR_EACH_SET_CARGO_ID(j, cargo_filter) {
-			if ((*a)->goods[j].HasRating()) maxr1 = max(maxr1, (*a)->goods[j].rating);
-			if ((*b)->goods[j].HasRating()) maxr2 = max(maxr2, (*b)->goods[j].rating);
+			if ((*a)->goods[j].HasRating()) maxr1 = ::max(maxr1, (*a)->goods[j].rating);
+			if ((*b)->goods[j].HasRating()) maxr2 = ::max(maxr2, (*b)->goods[j].rating);
 		}
 
 		return maxr1 - maxr2;
@@ -261,8 +261,8 @@ protected:
 
 		for (CargoID j = 0; j < NUM_CARGO; j++) {
 			if (!HasBit(cargo_filter, j)) continue;
-			if ((*a)->goods[j].HasRating()) minr1 = min(minr1, (*a)->goods[j].rating);
-			if ((*b)->goods[j].HasRating()) minr2 = min(minr2, (*b)->goods[j].rating);
+			if ((*a)->goods[j].HasRating()) minr1 = ::min(minr1, (*a)->goods[j].rating);
+			if ((*b)->goods[j].HasRating()) minr2 = ::min(minr2, (*b)->goods[j].rating);
 		}
 
 		return -(minr1 - minr2);
@@ -347,7 +347,7 @@ public:
 			case WID_STL_BUS:
 			case WID_STL_AIRPLANE:
 			case WID_STL_SHIP:
-				size->height = max<uint>(FONT_HEIGHT_SMALL, 10) + padding.height;
+				size->height = ::max<uint>(FONT_HEIGHT_SMALL, 10) + padding.height;
 				break;
 
 			case WID_STL_CARGOALL:
@@ -389,7 +389,7 @@ public:
 
 			case WID_STL_LIST: {
 				bool rtl = _current_text_dir == TD_RTL;
-				int max = min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), this->stations.Length());
+				int max = ::min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), this->stations.Length());
 				int y = r.top + WD_FRAMERECT_TOP;
 				for (int i = this->vscroll->GetPosition(); i < max; ++i) { // do until max number of stations of owner
 					const Station *st = this->stations[i];
@@ -772,7 +772,7 @@ static const NWidgetPart _nested_station_view_widgets[] = {
  */
 static void DrawCargoIcons(CargoID i, uint waiting, int left, int right, int y)
 {
-	uint num = min((waiting + 5) / 10, (right - left) / 10); // maximum is width / 10 icons so it won't overflow
+	uint num = ::min((waiting + 5) / 10, (right - left) / 10); // maximum is width / 10 icons so it won't overflow
 	if (num == 0) return;
 
 	SpriteID sprite = CargoSpec::Get(i)->GetCargoIcon();
@@ -844,7 +844,7 @@ struct StationViewWindow : public Window {
 			case WID_SV_WAITING:
 				resize->height = FONT_HEIGHT_NORMAL;
 				size->height = WD_FRAMERECT_TOP + 5 * resize->height + WD_FRAMERECT_BOTTOM;
-				this->expand_shrink_width = max(GetStringBoundingBox("-").width, GetStringBoundingBox("+").width) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
+				this->expand_shrink_width = ::max(GetStringBoundingBox("-").width, GetStringBoundingBox("+").width) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
 				break;
 
 			case WID_SV_ACCEPT_RATING_LIST:
@@ -1273,7 +1273,7 @@ static const T *FindStationsNearby(TileArea ta, bool distant_join)
 	FOR_ALL_BASE_STATIONS(st) {
 		if (T::IsExpected(st) && !st->IsInUse() && st->owner == _local_company) {
 			/* Include only within station spread (yes, it is strictly less than) */
-			if (max(DistanceMax(ta.tile, st->xy), DistanceMax(TILE_ADDXY(ta.tile, ta.w - 1, ta.h - 1), st->xy)) < _settings_game.station.station_spread) {
+			if (::max(DistanceMax(ta.tile, st->xy), DistanceMax(TILE_ADDXY(ta.tile, ta.w - 1, ta.h - 1), st->xy)) < _settings_game.station.station_spread) {
 				TileAndStation *ts = _deleted_stations_nearby.Append();
 				ts->tile = st->xy;
 				ts->station = st->index;
@@ -1290,8 +1290,8 @@ static const T *FindStationsNearby(TileArea ta, bool distant_join)
 	/* Only search tiles where we have a chance to stay within the station spread.
 	 * The complete check needs to be done in the callback as we don't know the
 	 * extent of the found station, yet. */
-	if (distant_join && min(ta.w, ta.h) >= _settings_game.station.station_spread) return NULL;
-	uint max_dist = distant_join ? _settings_game.station.station_spread - min(ta.w, ta.h) : 1;
+	if (distant_join && ::min(ta.w, ta.h) >= _settings_game.station.station_spread) return NULL;
+	uint max_dist = distant_join ? _settings_game.station.station_spread - ::min(ta.w, ta.h) : 1;
 
 	TileIndex tile = TILE_ADD(ctx.tile, TileOffsByDir(DIR_N));
 	CircularTileSearch(&tile, max_dist, ta.w, ta.h, AddNearbyStation<T>, &ctx);
@@ -1365,7 +1365,7 @@ struct SelectStationWindow : Window {
 			y += this->resize.step_height;
 		}
 
-		for (uint i = max<uint>(1, this->vscroll->GetPosition()); i <= _stations_nearby_list.Length(); ++i, y += this->resize.step_height) {
+		for (uint i = ::max<uint>(1, this->vscroll->GetPosition()); i <= _stations_nearby_list.Length(); ++i, y += this->resize.step_height) {
 			/* Don't draw anything if it extends past the end of the window. */
 			if (i - this->vscroll->GetPosition() >= this->vscroll->GetCapacity()) break;
 

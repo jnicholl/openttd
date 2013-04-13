@@ -20,6 +20,10 @@
 #include "core/smallvec_type.hpp"
 #include "core/smallmap_type.hpp"
 
+#ifdef __QNXNTO__
+#define USE_SIMPLE_WINDOW_GUI
+#endif
+
 /** State of handling an event. */
 enum EventState {
 	ES_HANDLED,     ///< The passed event is handled.
@@ -130,7 +134,11 @@ enum WidgetDrawDistances {
 	/* Dropdown widget. */
 	WD_DROPDOWN_HEIGHT     = 12, ///< Height of a drop down widget.
 	WD_DROPDOWNTEXT_LEFT   = 2,  ///< Left offset of the dropdown widget string.
+#ifdef USE_SIMPLE_WINDOW_GUI
+	WD_DROPDOWNTEXT_RIGHT  = 26, ///< Right offset of the dropdown widget string.
+#else
 	WD_DROPDOWNTEXT_RIGHT  = 14, ///< Right offset of the dropdown widget string.
+#endif
 	WD_DROPDOWNTEXT_TOP    = 1,  ///< Top offset of the dropdown widget string.
 	WD_DROPDOWNTEXT_BOTTOM = 1,  ///< Bottom offset of the dropdown widget string.
 

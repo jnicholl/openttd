@@ -2978,7 +2978,7 @@ static void UpdateTownRating(Town *t)
 	const Company *c;
 	FOR_ALL_COMPANIES(c) {
 		if (t->ratings[c->index] < RATING_GROWTH_MAXIMUM) {
-			t->ratings[c->index] = min((int)RATING_GROWTH_MAXIMUM, t->ratings[c->index] + RATING_GROWTH_UP_STEP);
+			t->ratings[c->index] = ::min((int)RATING_GROWTH_MAXIMUM, t->ratings[c->index] + RATING_GROWTH_UP_STEP);
 		}
 	}
 
@@ -2988,12 +2988,12 @@ static void UpdateTownRating(Town *t)
 			if (st->time_since_load <= 20 || st->time_since_unload <= 20) {
 				if (Company::IsValidID(st->owner)) {
 					int new_rating = t->ratings[st->owner] + RATING_STATION_UP_STEP;
-					t->ratings[st->owner] = min(new_rating, INT16_MAX); // do not let it overflow
+					t->ratings[st->owner] = ::min(new_rating, INT16_MAX); // do not let it overflow
 				}
 			} else {
 				if (Company::IsValidID(st->owner)) {
 					int new_rating = t->ratings[st->owner] + RATING_STATION_DOWN_STEP;
-					t->ratings[st->owner] = max(new_rating, INT16_MIN);
+					t->ratings[st->owner] = ::max(new_rating, INT16_MIN);
 				}
 			}
 		}
@@ -3060,9 +3060,9 @@ static void UpdateTownGrowRate(Town *t)
 	uint16 m;
 
 	if (t->fund_buildings_months != 0) {
-		m = _grow_count_values[0][min(n, 5)];
+		m = _grow_count_values[0][::min(n, 5)];
 	} else {
-		m = _grow_count_values[1][min(n, 5)];
+		m = _grow_count_values[1][::min(n, 5)];
 		if (n == 0 && !Chance16(1, 12)) return;
 	}
 

@@ -739,8 +739,8 @@ void Window::ReInit(int rx, int ry)
 	this->resize.step_height = this->nested_root->resize_y;
 
 	/* Resize as close to the original size + requested resize as possible. */
-	window_width  = max(window_width  + rx, this->width);
-	window_height = max(window_height + ry, this->height);
+	window_width  = ::max(window_width  + rx, this->width);
+	window_height = ::max(window_height + ry, this->height);
 	int dx = (this->resize.step_width  == 0) ? 0 : window_width  - this->width;
 	int dy = (this->resize.step_height == 0) ? 0 : window_height - this->height;
 	/* dx and dy has to go by step.. calculate it.
@@ -1225,8 +1225,8 @@ void Window::InitializePositionSize(int x, int y, int sm_width, int sm_height)
  */
 void Window::FindWindowPlacementAndResize(int def_width, int def_height)
 {
-	def_width  = max(def_width,  this->width); // Don't allow default size to be smaller than smallest size
-	def_height = max(def_height, this->height);
+	def_width  = ::max(def_width,  this->width); // Don't allow default size to be smaller than smallest size
+	def_height = ::max(def_height, this->height);
 	/* Try to make windows smaller when our window is too small.
 	 * w->(width|height) is normally the same as min_(width|height),
 	 * but this way the GUIs can be made a little more dynamic;
@@ -1240,8 +1240,8 @@ void Window::FindWindowPlacementAndResize(int def_width, int def_height)
 		wt = FindWindowById(WC_MAIN_TOOLBAR, 0);
 		if (wt != NULL) free_height -= wt->height;
 
-		int enlarge_x = max(min(def_width  - this->width,  _screen.width - this->width),  0);
-		int enlarge_y = max(min(def_height - this->height, free_height   - this->height), 0);
+		int enlarge_x = ::max(::min(def_width  - this->width,  _screen.width - this->width),  0);
+		int enlarge_y = ::max(::min(def_height - this->height, free_height   - this->height), 0);
 
 		/* X and Y has to go by step.. calculate it.
 		 * The cast to int is necessary else x/y are implicitly casted to
@@ -1262,8 +1262,8 @@ void Window::FindWindowPlacementAndResize(int def_width, int def_height)
 	if (nx + this->width > _screen.width) nx -= (nx + this->width - _screen.width);
 
 	const Window *wt = FindWindowById(WC_MAIN_TOOLBAR, 0);
-	ny = max(ny, (wt == NULL || this == wt || this->top == 0) ? 0 : wt->height);
-	nx = max(nx, 0);
+	ny = ::max(ny, (wt == NULL || this == wt || this->top == 0) ? 0 : wt->height);
+	nx = ::max(nx, 0);
 
 	if (this->viewport != NULL) {
 		this->viewport->left += nx - this->left;
@@ -1450,8 +1450,8 @@ static Point LocalGetWindowPlacement(const WindowDesc *desc, int16 sm_width, int
 	Point pt;
 	const Window *w;
 
-	int16 default_width  = max(desc->default_width,  sm_width);
-	int16 default_height = max(desc->default_height, sm_height);
+	int16 default_width  = ::max(desc->default_width,  sm_width);
+	int16 default_height = ::max(desc->default_height, sm_height);
 
 	if (desc->parent_cls != 0 /* WC_MAIN_WINDOW */ &&
 			(w = FindWindowById(desc->parent_cls, window_number)) != NULL &&
@@ -1820,14 +1820,14 @@ void ResizeWindow(Window *w, int delta_x, int delta_y, bool clamp_to_screen)
 			 * the resolution clamp it in such a manner that it stays within the bounds. */
 			int new_right  = w->left + w->width  + delta_x;
 			int new_bottom = w->top  + w->height + delta_y;
-			if (new_right  >= (int)_cur_resolution.width)  delta_x -= Ceil(new_right  - _cur_resolution.width,  max(1U, w->nested_root->resize_x));
-			if (new_bottom >= (int)_cur_resolution.height) delta_y -= Ceil(new_bottom - _cur_resolution.height, max(1U, w->nested_root->resize_y));
+			if (new_right  >= (int)_cur_resolution.width)  delta_x -= Ceil(new_right  - _cur_resolution.width,  ::max(1U, w->nested_root->resize_x));
+			if (new_bottom >= (int)_cur_resolution.height) delta_y -= Ceil(new_bottom - _cur_resolution.height, ::max(1U, w->nested_root->resize_y));
 		}
 
 		w->SetDirty();
 
-		uint new_xinc = max(0, (w->nested_root->resize_x == 0) ? 0 : (int)(w->nested_root->current_x - w->nested_root->smallest_x) + delta_x);
-		uint new_yinc = max(0, (w->nested_root->resize_y == 0) ? 0 : (int)(w->nested_root->current_y - w->nested_root->smallest_y) + delta_y);
+		uint new_xinc = ::max(0, (w->nested_root->resize_x == 0) ? 0 : (int)(w->nested_root->current_x - w->nested_root->smallest_x) + delta_x);
+		uint new_yinc = ::max(0, (w->nested_root->resize_y == 0) ? 0 : (int)(w->nested_root->current_y - w->nested_root->smallest_y) + delta_y);
 		assert(w->nested_root->resize_x == 0 || new_xinc % w->nested_root->resize_x == 0);
 		assert(w->nested_root->resize_y == 0 || new_yinc % w->nested_root->resize_y == 0);
 
@@ -2113,8 +2113,8 @@ static EventState HandleScrollbarScrolling()
 			}
 
 			/* Find the item we want to move to and make sure it's inside bounds. */
-			int pos = min(max(0, i + _scrollbar_start_pos) * sb->GetCount() / _scrollbar_size, max(0, sb->GetCount() - sb->GetCapacity()));
-			if (rtl) pos = max(0, sb->GetCount() - sb->GetCapacity() - pos);
+			int pos = ::min(::max(0, i + _scrollbar_start_pos) * sb->GetCount() / _scrollbar_size, ::max(0, sb->GetCount() - sb->GetCapacity()));
+			if (rtl) pos = ::max(0, sb->GetCount() - sb->GetCapacity() - pos);
 			if (pos != sb->GetPosition()) {
 				sb->SetPosition(pos);
 				w->SetDirty();
@@ -3127,7 +3127,7 @@ void RelocateAllWindows(int neww, int newh)
 				continue;
 
 			case WC_MAIN_TOOLBAR:
-				ResizeWindow(w, min(neww, *_preferred_toolbar_size) - w->width, 0, false);
+				ResizeWindow(w, ::min(neww, *_preferred_toolbar_size) - w->width, 0, false);
 
 				top = w->top;
 				left = PositionMainToolbar(w); // changes toolbar orientation
@@ -3139,7 +3139,7 @@ void RelocateAllWindows(int neww, int newh)
 				break;
 
 			case WC_STATUS_BAR:
-				ResizeWindow(w, min(neww, *_preferred_statusbar_size) - w->width, 0, false);
+				ResizeWindow(w, ::min(neww, *_preferred_statusbar_size) - w->width, 0, false);
 
 				top = newh - w->height;
 				left = PositionStatusbar(w);

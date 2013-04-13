@@ -145,10 +145,10 @@ enum DeterministicSpriteGroupAdjustType {
 enum DeterministicSpriteGroupAdjustOperation {
 	DSGA_OP_ADD,  ///< a + b
 	DSGA_OP_SUB,  ///< a - b
-	DSGA_OP_SMIN, ///< (signed) min(a, b)
-	DSGA_OP_SMAX, ///< (signed) max(a, b)
-	DSGA_OP_UMIN, ///< (unsigned) min(a, b)
-	DSGA_OP_UMAX, ///< (unsigned) max(a, b)
+	DSGA_OP_SMIN, ///< (signed) ::min(a, b)
+	DSGA_OP_SMAX, ///< (signed) ::max(a, b)
+	DSGA_OP_UMIN, ///< (unsigned) ::min(a, b)
+	DSGA_OP_UMAX, ///< (unsigned) ::max(a, b)
 	DSGA_OP_SDIV, ///< (signed) a / b
 	DSGA_OP_SMOD, ///< (signed) a % b
 	DSGA_OP_UDIV, ///< (unsigned) a / b

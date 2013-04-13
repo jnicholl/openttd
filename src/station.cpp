@@ -246,11 +246,11 @@ uint Station::GetCatchmentRadius() const
 	uint ret = CA_NONE;
 
 	if (_settings_game.station.modified_catchment) {
-		if (this->bus_stops          != NULL)         ret = max<uint>(ret, CA_BUS);
-		if (this->truck_stops        != NULL)         ret = max<uint>(ret, CA_TRUCK);
-		if (this->train_station.tile != INVALID_TILE) ret = max<uint>(ret, CA_TRAIN);
-		if (this->dock_tile          != INVALID_TILE) ret = max<uint>(ret, CA_DOCK);
-		if (this->airport.tile       != INVALID_TILE) ret = max<uint>(ret, this->airport.GetSpec()->catchment);
+		if (this->bus_stops          != NULL)         ret = ::max<uint>(ret, CA_BUS);
+		if (this->truck_stops        != NULL)         ret = ::max<uint>(ret, CA_TRUCK);
+		if (this->train_station.tile != INVALID_TILE) ret = ::max<uint>(ret, CA_TRAIN);
+		if (this->dock_tile          != INVALID_TILE) ret = ::max<uint>(ret, CA_DOCK);
+		if (this->airport.tile       != INVALID_TILE) ret = ::max<uint>(ret, this->airport.GetSpec()->catchment);
 	} else {
 		if (this->bus_stops != NULL || this->truck_stops != NULL || this->train_station.tile != INVALID_TILE || this->dock_tile != INVALID_TILE || this->airport.tile != INVALID_TILE) {
 			ret = CA_UNMODIFIED;
@@ -272,10 +272,10 @@ Rect Station::GetCatchmentRect() const
 	int catchment_radius = this->GetCatchmentRadius();
 
 	Rect ret = {
-		max<int>(this->rect.left   - catchment_radius, 0),
-		max<int>(this->rect.top    - catchment_radius, 0),
-		min<int>(this->rect.right  + catchment_radius, MapMaxX()),
-		min<int>(this->rect.bottom + catchment_radius, MapMaxY())
+		::max<int>(this->rect.left   - catchment_radius, 0),
+		::max<int>(this->rect.top    - catchment_radius, 0),
+		::min<int>(this->rect.right  + catchment_radius, MapMaxX()),
+		::min<int>(this->rect.bottom + catchment_radius, MapMaxY())
 	};
 
 	return ret;
@@ -339,9 +339,9 @@ void Station::RecomputeIndustriesNear()
 
 	/* Compute maximum extent of acceptance rectangle wrt. station sign */
 	TileIndex start_tile = this->xy;
-	uint max_radius = max(
-		max(DistanceManhattan(start_tile, TileXY(riv.rect.left,  riv.rect.top)), DistanceManhattan(start_tile, TileXY(riv.rect.left,  riv.rect.bottom))),
-		max(DistanceManhattan(start_tile, TileXY(riv.rect.right, riv.rect.top)), DistanceManhattan(start_tile, TileXY(riv.rect.right, riv.rect.bottom)))
+	uint max_radius = ::max(
+		::max(DistanceManhattan(start_tile, TileXY(riv.rect.left,  riv.rect.top)), DistanceManhattan(start_tile, TileXY(riv.rect.left,  riv.rect.bottom))),
+		::max(DistanceManhattan(start_tile, TileXY(riv.rect.right, riv.rect.top)), DistanceManhattan(start_tile, TileXY(riv.rect.right, riv.rect.bottom)))
 	);
 
 	CircularTileSearch(&start_tile, 2 * max_radius + 1, &FindIndustryToDeliver, &riv);
@@ -403,7 +403,7 @@ CommandCost StationRect::BeforeAddTile(TileIndex tile, StationRectMode mode)
 	} else if (!this->PtInExtendedRect(x, y)) {
 		/* current rect is not empty and new point is outside this rect
 		 * make new spread-out rectangle */
-		Rect new_rect = {min(x, this->left), min(y, this->top), max(x, this->right), max(y, this->bottom)};
+		Rect new_rect = {::min(x, this->left), ::min(y, this->top), ::max(x, this->right), ::max(y, this->bottom)};
 
 		/* check new rect dimensions against preset max */
 		int w = new_rect.right - new_rect.left + 1;

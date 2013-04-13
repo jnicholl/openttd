@@ -65,7 +65,7 @@ public:
 	 */
 	int Add(const char *text, int length)
 	{
-		int store_size = min(length, OUTPUT_BLOCK_SIZE - this->size);
+		int store_size = ::min(length, OUTPUT_BLOCK_SIZE - this->size);
 		assert(store_size >= 0);
 		assert(store_size <= OUTPUT_BLOCK_SIZE);
 		MemCpyT(this->data + this->size, text, store_size);

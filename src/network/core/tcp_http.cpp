@@ -253,7 +253,7 @@ int NetworkHTTPSocketHandler::Receive()
 		/* Wait till we read the end-of-header identifier */
 		if (this->recv_length == 0) {
 			int read = this->recv_pos + res;
-			int end = min(read, lengthof(this->recv_buffer) - 1);
+			int end = ::min(read, lengthof(this->recv_buffer) - 1);
 
 			/* Do a 'safe' search for the end of the header. */
 			char prev = this->recv_buffer[end];
@@ -274,7 +274,7 @@ int NetworkHTTPSocketHandler::Receive()
 				this->recv_length = ret;
 
 				end_of_header += strlen(END_OF_HEADER);
-				int len = min(read - (end_of_header - this->recv_buffer), res);
+				int len = ::min(read - (end_of_header - this->recv_buffer), res);
 				if (len != 0) {
 					this->callback->OnReceiveData(end_of_header, len);
 					this->recv_length -= len;
@@ -283,7 +283,7 @@ int NetworkHTTPSocketHandler::Receive()
 				this->recv_pos = 0;
 			}
 		} else {
-			res = min(this->recv_length, res);
+			res = ::min(this->recv_length, res);
 			/* Receive whatever we're expecting. */
 			this->callback->OnReceiveData(this->recv_buffer, res);
 			this->recv_length -= res;

@@ -880,7 +880,7 @@ void CallVehicleTicks()
 			case VEH_AIRCRAFT:
 			case VEH_SHIP:
 				if (v->vcache.cached_cargo_age_period != 0) {
-					v->cargo_age_counter = min(v->cargo_age_counter, v->vcache.cached_cargo_age_period);
+					v->cargo_age_counter = ::min(v->cargo_age_counter, v->vcache.cached_cargo_age_period);
 					if (--v->cargo_age_counter == 0) {
 						v->cargo.AgeCargo();
 						v->cargo_age_counter = v->vcache.cached_cargo_age_period;
@@ -1050,7 +1050,7 @@ Vehicle *CheckClickOnVehicle(const ViewPort *vp, int x, int y)
 				x >= v->coord.left && x <= v->coord.right &&
 				y >= v->coord.top && y <= v->coord.bottom) {
 
-			dist = max(
+			dist = ::max(
 				abs(((v->coord.left + v->coord.right) >> 1) - x),
 				abs(((v->coord.top + v->coord.bottom) >> 1) - y)
 			);
@@ -1091,7 +1091,7 @@ void CheckVehicleBreakdown(Vehicle *v)
 	int rel, rel_old;
 
 	/* decrease reliability */
-	v->reliability = rel = max((rel_old = v->reliability) - v->reliability_spd_dec, 0);
+	v->reliability = rel = ::max((rel_old = v->reliability) - v->reliability_spd_dec, 0);
 	if ((rel_old >> 8) != (rel >> 8)) SetWindowDirty(WC_VEHICLE_DETAILS, v->index);
 
 	if (v->breakdown_ctr != 0 || (v->vehstatus & VS_STOPPED) ||
@@ -1105,7 +1105,7 @@ void CheckVehicleBreakdown(Vehicle *v)
 	/* increase chance of failure */
 	int chance = v->breakdown_chance + 1;
 	if (Chance16I(1, 25, r)) chance += 25;
-	v->breakdown_chance = min(255, chance);
+	v->breakdown_chance = ::min(255, chance);
 
 	/* calculate reliability value to use in comparison */
 	rel = v->reliability;
@@ -1115,7 +1115,7 @@ void CheckVehicleBreakdown(Vehicle *v)
 	if (_settings_game.difficulty.vehicle_breakdowns == 1) rel += 0x6666;
 
 	/* check if to break down */
-	if (_breakdown_chance[(uint)min(rel, 0xffff) >> 10] <= v->breakdown_chance) {
+	if (_breakdown_chance[(uint)::min(rel, 0xffff) >> 10] <= v->breakdown_chance) {
 		v->breakdown_ctr    = GB(r, 16, 6) + 0x3F;
 		v->breakdown_delay  = GB(r, 24, 7) + 0x80;
 		v->breakdown_chance = 0;
@@ -1442,10 +1442,10 @@ void VehicleUpdateViewport(Vehicle *v, bool dirty)
 			MarkSingleVehicleDirty(v);
 		} else {
 			MarkAllViewportsDirty(
-				min(old_coord.left,   v->coord.left),
-				min(old_coord.top,    v->coord.top),
-				max(old_coord.right,  v->coord.right) + 1 * ZOOM_LVL_BASE,
-				max(old_coord.bottom, v->coord.bottom) + 1 * ZOOM_LVL_BASE
+				::min(old_coord.left,   v->coord.left),
+				::min(old_coord.top,    v->coord.top),
+				::max(old_coord.right,  v->coord.right) + 1 * ZOOM_LVL_BASE,
+				::max(old_coord.bottom, v->coord.bottom) + 1 * ZOOM_LVL_BASE
 			);
 		}
 	}
@@ -1547,7 +1547,7 @@ FreeUnitIDGenerator::FreeUnitIDGenerator(VehicleType type, CompanyID owner) : ca
 	const Vehicle *v;
 	FOR_ALL_VEHICLES(v) {
 		if (v->type == type && v->owner == owner) {
-			this->maxid = max<UnitID>(this->maxid, v->unitnumber);
+			this->maxid = ::max<UnitID>(this->maxid, v->unitnumber);
 		}
 	}
 
@@ -2038,7 +2038,7 @@ void Vehicle::HandleLoading(bool mode)
 {
 	switch (this->current_order.GetType()) {
 		case OT_LOADING: {
-			uint wait_time = max(this->current_order.wait_time - this->lateness_counter, 0);
+			uint wait_time = ::max(this->current_order.wait_time - this->lateness_counter, 0);
 
 			/* Not the first call for this tick, or still loading */
 			if (mode || !HasBit(this->vehicle_flags, VF_LOADING_FINISHED) || this->current_order_time < wait_time) return;
@@ -2247,10 +2247,10 @@ void Vehicle::ShowVisualEffect() const
 			return;
 		}
 
-		max_speed = min(max_speed, t->gcache.cached_max_track_speed);
-		max_speed = min(max_speed, this->current_order.max_speed);
+		max_speed = ::min(max_speed, t->gcache.cached_max_track_speed);
+		max_speed = ::min(max_speed, this->current_order.max_speed);
 	}
-	if (this->type == VEH_ROAD || this->type == VEH_SHIP) max_speed = min(max_speed, this->current_order.max_speed * 2);
+	if (this->type == VEH_ROAD || this->type == VEH_SHIP) max_speed = ::min(max_speed, this->current_order.max_speed * 2);
 
 	const Vehicle *v = this;
 

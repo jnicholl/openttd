@@ -106,7 +106,7 @@ void BaseVehicleListWindow::BuildVehicleList()
 
 	uint unitnumber = 0;
 	for (const Vehicle **v = this->vehicles.Begin(); v != this->vehicles.End(); v++) {
-		unitnumber = max<uint>(unitnumber, (*v)->unitnumber);
+		unitnumber = ::max<uint>(unitnumber, (*v)->unitnumber);
 	}
 
 	/* Because 111 is much less wide than e.g. 999 we use the
@@ -322,7 +322,7 @@ static void DrawVehicleRefitWindow(const SubtypeList list[NUM_CARGO], const int 
 	uint current = 0;
 
 	bool rtl = _current_text_dir == TD_RTL;
-	uint iconwidth = max(GetSpriteSize(SPR_CIRCLE_FOLDED).width, GetSpriteSize(SPR_CIRCLE_UNFOLDED).width);
+	uint iconwidth = ::max(GetSpriteSize(SPR_CIRCLE_FOLDED).width, GetSpriteSize(SPR_CIRCLE_UNFOLDED).width);
 	uint iconheight = GetSpriteSize(SPR_CIRCLE_FOLDED).height;
 	int linecolour = _colour_gradient[COLOUR_ORANGE][4];
 
@@ -630,7 +630,7 @@ struct RefitWindow : public Window {
 
 		/* Calculate sprite position. */
 		NWidgetCore *vehicle_panel_display = this->GetWidget<NWidgetCore>(WID_VR_VEHICLE_PANEL_DISPLAY);
-		int sprite_width = max(0, ((int)vehicle_panel_display->current_x - this->vehicle_width) / 2);
+		int sprite_width = ::max(0, ((int)vehicle_panel_display->current_x - this->vehicle_width) / 2);
 		this->sprite_left = vehicle_panel_display->pos_x;
 		this->sprite_right = vehicle_panel_display->pos_x + vehicle_panel_display->current_x - 1;
 		if (_current_text_dir == TD_RTL) {
@@ -742,7 +742,7 @@ struct RefitWindow : public Window {
 								}
 
 								int right = Clamp(left + width, 0, r.right);
-								left = max(0, left);
+								left = ::max(0, left);
 
 								if (_current_text_dir == TD_RTL) {
 									right = this->GetWidget<NWidgetCore>(WID_VR_VEHICLE_PANEL_DISPLAY)->current_x - left;
@@ -815,7 +815,7 @@ struct RefitWindow : public Window {
 						StringID string = this->GetCapacityString(&list[i][j]);
 						if (string != INVALID_STRING_ID) {
 							Dimension dim = GetStringBoundingBox(string);
-							max_width = max(dim.width, max_width);
+							max_width = ::max(dim.width, max_width);
 						}
 					}
 				}
@@ -849,8 +849,8 @@ struct RefitWindow : public Window {
 	{
 		drag_x = GetClickPosition(drag_x);
 
-		int left_x  = min(this->click_x, drag_x);
-		int right_x = max(this->click_x, drag_x);
+		int left_x  = ::min(this->click_x, drag_x);
+		int right_x = ::max(this->click_x, drag_x);
 		this->num_vehicles = 0;
 
 		Vehicle *v = Vehicle::Get(this->window_number);
@@ -1329,7 +1329,7 @@ uint GetVehicleListHeight(VehicleType type, uint divisor)
 	/* Name + vehicle + profit */
 	uint base = GetVehicleHeight(type) + 2 * FONT_HEIGHT_SMALL;
 	/* Drawing of the 4 small orders + profit*/
-	if (type >= VEH_SHIP) base = max(base, 5U * FONT_HEIGHT_SMALL);
+	if (type >= VEH_SHIP) base = ::max(base, 5U * FONT_HEIGHT_SMALL);
 
 	if (divisor == 1) return base;
 
@@ -1356,8 +1356,8 @@ void BaseVehicleListWindow::DrawVehicleListItems(VehicleID selected_vehicle, int
 	int text_right = right - (rtl ? text_offset :           0);
 
 	bool show_orderlist = this->vli.vtype >= VEH_SHIP;
-	int orderlist_left  = left  + (rtl ? 0 : max(100 + text_offset, width / 2));
-	int orderlist_right = right - (rtl ? max(100 + text_offset, width / 2) : 0);
+	int orderlist_left  = left  + (rtl ? 0 : ::max(100 + text_offset, width / 2));
+	int orderlist_right = right - (rtl ? ::max(100 + text_offset, width / 2) : 0);
 
 	int image_left  = (rtl && show_orderlist) ? orderlist_right : text_left;
 	int image_right = (!rtl && show_orderlist) ? orderlist_left : text_right;
@@ -1365,7 +1365,7 @@ void BaseVehicleListWindow::DrawVehicleListItems(VehicleID selected_vehicle, int
 	int vehicle_button_x = rtl ? right - GetSpriteSize(SPR_PROFIT_LOT).width : left;
 
 	int y = r.top;
-	uint max = min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), this->vehicles.Length());
+	uint max = ::min(this->vscroll->GetPosition() + this->vscroll->GetCapacity(), this->vehicles.Length());
 	for (uint i = this->vscroll->GetPosition(); i < max; ++i) {
 		const Vehicle *v = this->vehicles[i];
 		StringID str;
@@ -1957,7 +1957,7 @@ struct VehicleDetailsWindow : Window {
 			case WID_VD_SERVICING_INTERVAL:
 				SetDParamMaxValue(0, MAX_SERVINT_DAYS); // Roughly the maximum interval
 				SetDParamMaxValue(1, MAX_YEAR * DAYS_IN_YEAR); // Roughly the maximum year
-				size->width = max(GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_PERCENT).width, GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_DAYS).width) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
+				size->width = ::max(GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_PERCENT).width, GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_DAYS).width) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
 				size->height = WD_FRAMERECT_TOP + FONT_HEIGHT_NORMAL + WD_FRAMERECT_BOTTOM;
 				break;
 		}
@@ -2067,7 +2067,7 @@ struct VehicleDetailsWindow : Window {
 			case WID_VD_MIDDLE_DETAILS: {
 				/* For other vehicles, at the place of the matrix. */
 				bool rtl = _current_text_dir == TD_RTL;
-				uint sprite_width = max<uint>(UnScaleByZoom(GetSprite(v->GetImage(rtl ? DIR_E : DIR_W, EIT_IN_DETAILS), ST_NORMAL)->width, ZOOM_LVL_GUI), 70U) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
+				uint sprite_width = ::max<uint>(UnScaleByZoom(GetSprite(v->GetImage(rtl ? DIR_E : DIR_W, EIT_IN_DETAILS), ST_NORMAL)->width, ZOOM_LVL_GUI), 70U) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
 
 				uint text_left  = r.left  + (rtl ? 0 : sprite_width);
 				uint text_right = r.right - (rtl ? sprite_width : 0);
@@ -2631,7 +2631,12 @@ public:
 			case WID_VV_CENTER_MAIN_VIEW: {// center main view
 				const Window *mainwindow = FindWindowById(WC_MAIN_WINDOW, 0);
 				/* code to allow the main window to 'follow' the vehicle if the ctrl key is pressed */
+#if defined(__QNXNTO__)
+				// JEREMY: Follow vehicles by default, no ctrl key.
+				if (mainwindow->viewport->zoom <= ZOOM_LVL_OUT_4X) {
+#else
 				if (_ctrl_pressed && mainwindow->viewport->zoom <= ZOOM_LVL_OUT_4X) {
+#endif
 					mainwindow->viewport->follow_vehicle = v->index;
 				} else {
 					ScrollMainWindowTo(v->x_pos, v->y_pos, v->z_pos);

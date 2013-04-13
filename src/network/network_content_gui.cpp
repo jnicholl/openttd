@@ -816,7 +816,7 @@ public:
 				break;
 			case WKC_PAGEDOWN:
 				/* scroll down a page */
-				this->list_pos = min(this->list_pos + this->vscroll->GetCapacity(), (int)this->content.Length() - 1);
+				this->list_pos = ::min(this->list_pos + this->vscroll->GetCapacity(), (int)this->content.Length() - 1);
 				break;
 			case WKC_HOME:
 				/* jump to beginning */

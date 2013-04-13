@@ -288,7 +288,7 @@ void GRFParameterInfo::SetValue(struct GRFConfig *config, uint32 value)
 	} else {
 		SB(config->param[this->param_nr], this->first_bit, this->num_bit, value);
 	}
-	config->num_params = max<uint>(config->num_params, this->param_nr + 1);
+	config->num_params = ::max<uint>(config->num_params, this->param_nr + 1);
 	SetWindowDirty(WC_GAME_OPTIONS, WN_GAME_OPTIONS_NEWGRF_STATE);
 }
 
@@ -360,7 +360,7 @@ static bool CalcGRFMD5Sum(GRFConfig *config, Subdirectory subdir)
 	if (f == NULL) return false;
 
 	size_t start = ftell(f);
-	size = min(size, GRFGetSizeOfDataSection(f));
+	size = ::min(size, GRFGetSizeOfDataSection(f));
 	fseek(f, start, SEEK_SET);
 
 	/* calculate md5sum */

@@ -352,7 +352,7 @@ struct MemoryDumper {
 		size_t t = this->GetSize();
 
 		while (t > 0) {
-			size_t to_write = min(MEMORY_CHUNK_SIZE, t);
+			size_t to_write = ::min(MEMORY_CHUNK_SIZE, t);
 
 			writer->Write(this->blocks[i++], to_write);
 			t -= to_write;
@@ -1014,7 +1014,7 @@ static void SlSaveLoadConv(void *ptr, VarType conv)
 static inline size_t SlCalcNetStringLen(const char *ptr, size_t length)
 {
 	if (ptr == NULL) return 0;
-	return min(strlen(ptr), length - 1);
+	return ::min(strlen(ptr), length - 1);
 }
 
 /**
@@ -2076,7 +2076,11 @@ struct ZlibSaveFilter : SaveFilter {
 	 */
 	void WriteLoop(byte *p, size_t len, int mode)
 	{
+#if defined(__QNXNTO__)
+		static byte buf[MEMORY_CHUNK_SIZE]; // output buffer needs to be static
+#else
 		byte buf[MEMORY_CHUNK_SIZE]; // output buffer
+#endif
 		uint n;
 		this->z.next_in = p;
 		this->z.avail_in = (uInt)len;
@@ -2178,6 +2182,9 @@ struct LZMALoadFilter : LoadFilter {
 /** Filter using LZMA compression. */
 struct LZMASaveFilter : SaveFilter {
 	lzma_stream lzma; ///< Stream state that we are writing to.
+#ifdef __QNXNTO__
+	byte *m_buf;
+#endif
 
 	/**
 	 * Initialise this filter.
@@ -2187,12 +2194,18 @@ struct LZMASaveFilter : SaveFilter {
 	LZMASaveFilter(SaveFilter *chain, byte compression_level) : SaveFilter(chain), lzma(_lzma_init)
 	{
 		if (lzma_easy_encoder(&this->lzma, compression_level, LZMA_CHECK_CRC32) != LZMA_OK) SlError(STR_GAME_SAVELOAD_ERROR_BROKEN_INTERNAL_ERROR, "cannot initialize compressor");
+#ifdef __QNXNTO__
+		else m_buf = new byte[MEMORY_CHUNK_SIZE];
+#endif
 	}
 
 	/** Clean up what we allocated. */
 	~LZMASaveFilter()
 	{
 		lzma_end(&this->lzma);
+#ifdef __QNXNTO__
+		delete [] m_buf;
+#endif
 	}
 
 	/**
@@ -2203,18 +2216,24 @@ struct LZMASaveFilter : SaveFilter {
 	 */
 	void WriteLoop(byte *p, size_t len, lzma_action action)
 	{
+#ifdef __QNXNTO__
+		byte *buf = m_buf;
+		unsigned sizeofBuf = MEMORY_CHUNK_SIZE * sizeof(byte);
+#else
 		byte buf[MEMORY_CHUNK_SIZE]; // output buffer
+		unsigned sizeofBuf = sizeof(buf);
+#endif
 		size_t n;
 		this->lzma.next_in = p;
 		this->lzma.avail_in = len;
 		do {
 			this->lzma.next_out = buf;
-			this->lzma.avail_out = sizeof(buf);
+			this->lzma.avail_out = sizeofBuf;
 
 			lzma_ret r = lzma_code(&this->lzma, action);
 
 			/* bytes were emitted? */
-			if ((n = sizeof(buf) - this->lzma.avail_out) != 0) {
+			if ((n = sizeofBuf - this->lzma.avail_out) != 0) {
 				this->chain->Write(buf, n);
 			}
 			if (r == LZMA_STREAM_END) break;

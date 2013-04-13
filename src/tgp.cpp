@@ -306,7 +306,7 @@ static inline height_t RandomHeight(amplitude_t rMax)
  */
 static bool ApplyNoise(uint log_frequency, amplitude_t amplitude)
 {
-	uint size_min = min(_height_map.size_x, _height_map.size_y);
+	uint size_min = ::min(_height_map.size_x, _height_map.size_y);
 	uint step = size_min >> log_frequency;
 	uint x, y;
 
@@ -361,7 +361,7 @@ static bool ApplyNoise(uint log_frequency, amplitude_t amplitude)
 /** Base Perlin noise generator - fills height map with raw Perlin noise */
 static void HeightMapGenerate()
 {
-	uint size_min = min(_height_map.size_x, _height_map.size_y);
+	uint size_min = ::min(_height_map.size_x, _height_map.size_y);
 	uint iteration_round = 0;
 	amplitude_t amplitude;
 	bool continue_iteration;
@@ -707,7 +707,7 @@ static double perlin_coast_noise_2D(const double x, const double y, const double
  */
 static void HeightMapCoastLines(uint8 water_borders)
 {
-	int smallest_size = min(_settings_game.game_creation.map_x, _settings_game.game_creation.map_y);
+	int smallest_size = ::min(_settings_game.game_creation.map_x, _settings_game.game_creation.map_y);
 	const int margin = 4;
 	uint y, x;
 	double max_x;
@@ -718,7 +718,7 @@ static void HeightMapCoastLines(uint8 water_borders)
 		if (HasBit(water_borders, BORDER_NE)) {
 			/* Top right */
 			max_x = abs((perlin_coast_noise_2D(_height_map.size_y - y, y, 0.9, 53) + 0.25) * 5 + (perlin_coast_noise_2D(y, y, 0.35, 179) + 1) * 12);
-			max_x = max((smallest_size * smallest_size / 16) + max_x, (smallest_size * smallest_size / 16) + margin - max_x);
+			max_x = ::max((smallest_size * smallest_size / 16) + max_x, (smallest_size * smallest_size / 16) + margin - max_x);
 			if (smallest_size < 8 && max_x > 5) max_x /= 1.5;
 			for (x = 0; x < max_x; x++) {
 				_height_map.height(x, y) = 0;
@@ -728,7 +728,7 @@ static void HeightMapCoastLines(uint8 water_borders)
 		if (HasBit(water_borders, BORDER_SW)) {
 			/* Bottom left */
 			max_x = abs((perlin_coast_noise_2D(_height_map.size_y - y, y, 0.85, 101) + 0.3) * 6 + (perlin_coast_noise_2D(y, y, 0.45,  67) + 0.75) * 8);
-			max_x = max((smallest_size * smallest_size / 16) + max_x, (smallest_size * smallest_size / 16) + margin - max_x);
+			max_x = ::max((smallest_size * smallest_size / 16) + max_x, (smallest_size * smallest_size / 16) + margin - max_x);
 			if (smallest_size < 8 && max_x > 5) max_x /= 1.5;
 			for (x = _height_map.size_x; x > (_height_map.size_x - 1 - max_x); x--) {
 				_height_map.height(x, y) = 0;
@@ -741,7 +741,7 @@ static void HeightMapCoastLines(uint8 water_borders)
 		if (HasBit(water_borders, BORDER_NW)) {
 			/* Top left */
 			max_y = abs((perlin_coast_noise_2D(x, _height_map.size_y / 2, 0.9, 167) + 0.4) * 5 + (perlin_coast_noise_2D(x, _height_map.size_y / 3, 0.4, 211) + 0.7) * 9);
-			max_y = max((smallest_size * smallest_size / 16) + max_y, (smallest_size * smallest_size / 16) + margin - max_y);
+			max_y = ::max((smallest_size * smallest_size / 16) + max_y, (smallest_size * smallest_size / 16) + margin - max_y);
 			if (smallest_size < 8 && max_y > 5) max_y /= 1.5;
 			for (y = 0; y < max_y; y++) {
 				_height_map.height(x, y) = 0;
@@ -751,7 +751,7 @@ static void HeightMapCoastLines(uint8 water_borders)
 		if (HasBit(water_borders, BORDER_SE)) {
 			/* Bottom right */
 			max_y = abs((perlin_coast_noise_2D(x, _height_map.size_y / 3, 0.85, 71) + 0.25) * 6 + (perlin_coast_noise_2D(x, _height_map.size_y / 3, 0.35, 193) + 0.75) * 12);
-			max_y = max((smallest_size * smallest_size / 16) + max_y, (smallest_size * smallest_size / 16) + margin - max_y);
+			max_y = ::max((smallest_size * smallest_size / 16) + max_y, (smallest_size * smallest_size / 16) + margin - max_y);
 			if (smallest_size < 8 && max_y > 5) max_y /= 1.5;
 			for (y = _height_map.size_y; y > (_height_map.size_y - 1 - max_y); y--) {
 				_height_map.height(x, y) = 0;
@@ -791,7 +791,7 @@ static void HeightMapSmoothCoastInDirection(int org_x, int org_y, int dir_x, int
 	 * Soften the coast slope */
 	for (depth = 0; IsValidXY(x, y) && depth <= max_coast_Smooth_depth; depth++, x += dir_x, y += dir_y) {
 		h = _height_map.height(x, y);
-		h = min(h, h_prev + (4 + depth)); // coast softening formula
+		h = ::min(h, h_prev + (4 + depth)); // coast softening formula
 		_height_map.height(x, y) = h;
 		h_prev = h;
 	}
@@ -825,13 +825,13 @@ static void HeightMapSmoothSlopes(height_t dh_max)
 	int x, y;
 	for (y = 0; y <= (int)_height_map.size_y; y++) {
 		for (x = 0; x <= (int)_height_map.size_x; x++) {
-			height_t h_max = min(_height_map.height(x > 0 ? x - 1 : x, y), _height_map.height(x, y > 0 ? y - 1 : y)) + dh_max;
+			height_t h_max = ::min(_height_map.height(x > 0 ? x - 1 : x, y), _height_map.height(x, y > 0 ? y - 1 : y)) + dh_max;
 			if (_height_map.height(x, y) > h_max) _height_map.height(x, y) = h_max;
 		}
 	}
 	for (y = _height_map.size_y; y >= 0; y--) {
 		for (x = _height_map.size_x; x >= 0; x--) {
-			height_t h_max = min(_height_map.height((uint)x < _height_map.size_x ? x + 1 : x, y), _height_map.height(x, (uint)y < _height_map.size_y ? y + 1 : y)) + dh_max;
+			height_t h_max = ::min(_height_map.height((uint)x < _height_map.size_x ? x + 1 : x, y), _height_map.height(x, (uint)y < _height_map.size_y ? y + 1 : y)) + dh_max;
 			if (_height_map.height(x, y) > h_max) _height_map.height(x, y) = h_max;
 		}
 	}

@@ -33,6 +33,10 @@
 #include "table/strings.h"
 #include "table/sprites.h"
 
+#if defined(__QNXNTO__)
+#define USE_SIMPLE_INTRO_GUI
+#endif
+
 struct SelectGameWindow : public Window {
 
 	SelectGameWindow(const WindowDesc *desc) : Window()
@@ -58,22 +62,27 @@ struct SelectGameWindow : public Window {
 
 	virtual void OnInit()
 	{
+#if !defined(USE_SIMPLE_INTRO_GUI)
 		bool missing = _current_language->missing >= _settings_client.gui.missing_strings_threshold && !IsReleasedVersion();
 		this->GetWidget<NWidgetStacked>(WID_SGI_TRANSLATION_SELECTION)->SetDisplayedPlane(missing ? 0 : SZSP_NONE);
+#endif
 	}
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
+#if !defined(USE_SIMPLE_INTRO_GUI)
 		switch (widget) {
 			case WID_SGI_TRANSLATION:
 				SetDParam(0, _current_language->missing);
 				DrawStringMultiLine(r.left, r.right, r.top,  r.bottom, STR_INTRO_TRANSLATION, TC_FROMSTRING, SA_CENTER);
 				break;
 		}
+#endif
 	}
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
+#if !defined(USE_SIMPLE_INTRO_GUI)
 		switch (widget) {
 			case WID_SGI_TRANSLATION: {
 				SetDParam(0, _current_language->missing);
@@ -90,6 +99,7 @@ struct SelectGameWindow : public Window {
 				break;
 			}
 		}
+#endif
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
@@ -110,9 +120,11 @@ struct SelectGameWindow : public Window {
 				break;
 
 			case WID_SGI_LOAD_GAME:      ShowSaveLoadDialog(SLD_LOAD_GAME); break;
+#if !defined(USE_SIMPLE_INTRO_GUI)
 			case WID_SGI_PLAY_SCENARIO:  ShowSaveLoadDialog(SLD_LOAD_SCENARIO); break;
 			case WID_SGI_PLAY_HEIGHTMAP: ShowSaveLoadDialog(SLD_LOAD_HEIGHTMAP); break;
 			case WID_SGI_EDIT_SCENARIO:  StartScenarioEditor(); break;
+#endif
 
 			case WID_SGI_PLAY_NETWORK:
 				if (!_network_available) {
@@ -128,6 +140,7 @@ struct SelectGameWindow : public Window {
 				break;
 
 			case WID_SGI_OPTIONS:         ShowGameOptions(); break;
+#if !defined(USE_SIMPLE_INTRO_GUI)
 			case WID_SGI_HIGHSCORE:       ShowHighscoreTable(); break;
 			case WID_SGI_SETTINGS_OPTIONS:ShowGameSettings(); break;
 			case WID_SGI_GRF_SETTINGS:    ShowNewGRFSettings(true, true, false, &_grfconfig_newgame); break;
@@ -140,10 +153,50 @@ struct SelectGameWindow : public Window {
 				break;
 			case WID_SGI_AI_SETTINGS:     ShowAIConfigWindow(); break;
 			case WID_SGI_EXIT:            HandleExitGameRequest(); break;
+#endif
 		}
 	}
 };
 
+#if defined(USE_SIMPLE_INTRO_GUI)
+static const NWidgetPart _nested_select_game_widgets[] = {
+	NWidget(WWT_CAPTION, COLOUR_BROWN), SetDataTip(STR_INTRO_CAPTION, STR_NULL),
+	NWidget(WWT_PANEL, COLOUR_BROWN),
+	NWidget(NWID_SPACER), SetMinimalSize(0, 8),
+
+	/* 'generate game', 'load game' and 'play multiplayer'buttons */
+	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_GENERATE_GAME), SetMinimalSize(158, 12),
+						SetDataTip(STR_INTRO_NEW_GAME, STR_INTRO_TOOLTIP_NEW_GAME), SetPadding(0, 10, 6, 10), SetFill(1, 0),
+	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_LOAD_GAME), SetMinimalSize(158, 12),
+						SetDataTip(STR_INTRO_LOAD_GAME, STR_INTRO_TOOLTIP_LOAD_GAME), SetPadding(0, 10, 6, 10), SetFill(1, 0),
+	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_PLAY_NETWORK), SetMinimalSize(158, 12),
+						SetDataTip(STR_INTRO_MULTIPLAYER, STR_INTRO_TOOLTIP_MULTIPLAYER), SetPadding(0, 10, 7, 10), SetFill(1, 0),
+
+
+	/* climate selection buttons */
+	NWidget(NWID_HORIZONTAL),
+		NWidget(NWID_SPACER), SetMinimalSize(10, 0), SetFill(1, 0),
+		NWidget(WWT_IMGBTN_2, COLOUR_ORANGE, WID_SGI_TEMPERATE_LANDSCAPE), SetMinimalSize(77, 55),
+							SetDataTip(SPR_SELECT_TEMPERATE, STR_INTRO_TOOLTIP_TEMPERATE),
+		NWidget(NWID_SPACER), SetMinimalSize(3, 0), SetFill(1, 0),
+		NWidget(WWT_IMGBTN_2, COLOUR_ORANGE, WID_SGI_ARCTIC_LANDSCAPE), SetMinimalSize(77, 55),
+							SetDataTip(SPR_SELECT_SUB_ARCTIC, STR_INTRO_TOOLTIP_SUB_ARCTIC_LANDSCAPE),
+		NWidget(NWID_SPACER), SetMinimalSize(3, 0), SetFill(1, 0),
+		NWidget(WWT_IMGBTN_2, COLOUR_ORANGE, WID_SGI_TROPIC_LANDSCAPE), SetMinimalSize(77, 55),
+							SetDataTip(SPR_SELECT_SUB_TROPICAL, STR_INTRO_TOOLTIP_SUB_TROPICAL_LANDSCAPE),
+		NWidget(NWID_SPACER), SetMinimalSize(3, 0), SetFill(1, 0),
+		NWidget(WWT_IMGBTN_2, COLOUR_ORANGE, WID_SGI_TOYLAND_LANDSCAPE), SetMinimalSize(77, 55),
+							SetDataTip(SPR_SELECT_TOYLAND, STR_INTRO_TOOLTIP_TOYLAND_LANDSCAPE),
+		NWidget(NWID_SPACER), SetMinimalSize(10, 0), SetFill(1, 0),
+	EndContainer(),
+
+	/* 'game options' buttons */
+	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_OPTIONS), SetMinimalSize(158, 12),
+						SetDataTip(STR_INTRO_GAME_OPTIONS, STR_INTRO_TOOLTIP_GAME_OPTIONS), SetPadding(7, 10, 8, 10), SetFill(1, 0),
+
+	EndContainer(),
+};
+#else
 static const NWidgetPart _nested_select_game_widgets[] = {
 	NWidget(WWT_CAPTION, COLOUR_BROWN), SetDataTip(STR_INTRO_CAPTION, STR_NULL),
 	NWidget(WWT_PANEL, COLOUR_BROWN),
@@ -245,6 +298,7 @@ static const NWidgetPart _nested_select_game_widgets[] = {
 
 	EndContainer(),
 };
+#endif
 
 static const WindowDesc _select_game_desc(
 	WDP_CENTER, 0, 0,

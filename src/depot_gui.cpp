@@ -189,12 +189,12 @@ static void InitBlocksizeForVehicles(VehicleType type, EngineImageType image_typ
 
 	switch (image_type) {
 		case EIT_IN_DEPOT:
-			_base_block_sizes_depot[type].height       = max(GetVehicleHeight(type), max_height);
+			_base_block_sizes_depot[type].height       = ::max(GetVehicleHeight(type), max_height);
 			_base_block_sizes_depot[type].extend_left  = Clamp(max_extend_left, 16, 98);
 			_base_block_sizes_depot[type].extend_right = Clamp(max_extend_right, 16, 98);
 			break;
 		case EIT_PURCHASE:
-			_base_block_sizes_purchase[type].height       = max(GetVehicleHeight(type), max_height);
+			_base_block_sizes_purchase[type].height       = ::max(GetVehicleHeight(type), max_height);
 			_base_block_sizes_purchase[type].extend_left  = Clamp(max_extend_left, 16, 98);
 			_base_block_sizes_purchase[type].extend_right = Clamp(max_extend_right, 16, 98);
 			break;
@@ -297,7 +297,7 @@ struct DepotWindow : Window {
 			case VEH_AIRCRAFT: {
 				const Sprite *spr = GetSprite(v->GetImage(DIR_W, EIT_IN_DEPOT), ST_NORMAL);
 				DrawAircraftImage(v, image_left, image_right,
-									y + max(UnScaleByZoom(spr->height, ZOOM_LVL_GUI) + UnScaleByZoom(spr->y_offs, ZOOM_LVL_GUI) - 14, 0), // tall sprites needs an y offset
+									y + ::max(UnScaleByZoom(spr->height, ZOOM_LVL_GUI) + UnScaleByZoom(spr->y_offs, ZOOM_LVL_GUI) - 14, 0), // tall sprites needs an y offset
 									this->sel, EIT_IN_DEPOT);
 				break;
 			}
@@ -339,7 +339,7 @@ struct DepotWindow : Window {
 		uint16 boxes_in_each_row = GB(mat_data, MAT_COL_START, MAT_COL_BITS);
 
 		uint16 num = this->vscroll->GetPosition() * boxes_in_each_row;
-		int maxval = min(this->vehicle_list.Length(), num + (rows_in_display * boxes_in_each_row));
+		int maxval = ::min(this->vehicle_list.Length(), num + (rows_in_display * boxes_in_each_row));
 		int y;
 		for (y = r.top + 1; num < maxval; y += this->resize.step_height) { // Draw the rows
 			for (byte i = 0; i < boxes_in_each_row && num < maxval; i++, num++) {
@@ -354,7 +354,7 @@ struct DepotWindow : Window {
 			}
 		}
 
-		maxval = min(this->vehicle_list.Length() + this->wagon_list.Length(), (this->vscroll->GetPosition() * boxes_in_each_row) + (rows_in_display * boxes_in_each_row));
+		maxval = ::min(this->vehicle_list.Length() + this->wagon_list.Length(), (this->vscroll->GetPosition() * boxes_in_each_row) + (rows_in_display * boxes_in_each_row));
 
 		/* Draw the train wagons without an engine in front. */
 		for (; num < maxval; num++, y += this->resize.step_height) {
@@ -613,15 +613,15 @@ struct DepotWindow : Window {
 				this->flag_height = UnScaleByZoom(spr->height, ZOOM_LVL_GUI);
 
 				if (this->type == VEH_TRAIN || this->type == VEH_ROAD) {
-					min_height = max<uint>(unumber.height + WD_MATRIX_TOP, UnScaleByZoom(spr->height, ZOOM_LVL_GUI));
+					min_height = ::max<uint>(unumber.height + WD_MATRIX_TOP, UnScaleByZoom(spr->height, ZOOM_LVL_GUI));
 					this->header_width = unumber.width + this->flag_width + WD_FRAMERECT_LEFT;
 				} else {
 					min_height = unumber.height + UnScaleByZoom(spr->height, ZOOM_LVL_GUI) + WD_MATRIX_TOP + WD_PAR_VSEP_NORMAL + WD_MATRIX_BOTTOM;
-					this->header_width = max<uint>(unumber.width, this->flag_width) + WD_FRAMERECT_RIGHT;
+					this->header_width = ::max<uint>(unumber.width, this->flag_width) + WD_FRAMERECT_RIGHT;
 				}
 				int base_width = this->count_width + this->header_width;
 
-				resize->height = max<uint>(GetVehicleImageCellSize(this->type, EIT_IN_DEPOT).height, min_height);
+				resize->height = ::max<uint>(GetVehicleImageCellSize(this->type, EIT_IN_DEPOT).height, min_height);
 				if (this->type == VEH_TRAIN) {
 					resize->width = 1;
 					size->width = base_width + 2 * 29; // about 2 parts
@@ -666,7 +666,7 @@ struct DepotWindow : Window {
 				for (const Train *v = Train::From(this->vehicle_list[num]); v != NULL; v = v->Next()) {
 					width += v->GetDisplayImageWidth();
 				}
-				max_width = max(max_width, width);
+				max_width = ::max(max_width, width);
 			}
 			/* Always have 1 empty row, so people can change the setting of the train */
 			this->vscroll->SetCount(this->vehicle_list.Length() + this->wagon_list.Length() + 1);

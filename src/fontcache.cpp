@@ -25,7 +25,11 @@ static const int MAX_FONT_SIZE     = 72; ///< Maximum font size.
 /** Semi-constant for the height of the different sizes of fonts. */
 int _font_height[FS_END];
 /** Default heights for the different sizes of fonts. */
+#ifdef __QNXNTO__
+static const int _default_font_height[FS_END] = {20, 16, 36, 20};
+#else
 static const int _default_font_height[FS_END] = {10, 6, 18, 10};
+#endif
 
 /**
  * Reset the font sizes to the defaults of the sprite based fonts.
@@ -287,7 +291,7 @@ static const char *GetEnglishFontName(const ENUMLOGFONTEX *logfont)
 		offset += buf[pos++];
 
 		/* Don't buffer overflow */
-		length = min(length, MAX_PATH - 1);
+		length = ::min(length, MAX_PATH - 1);
 		for (uint j = 0; j < length; j++) font_name[j] = buf[stringOffset + offset + j];
 		font_name[length] = '\0';
 
@@ -828,7 +832,7 @@ static void SetFontGeometry(FT_Face face, FontSize size, int pixels)
 			/* Font height is minimum height plus the difference between the default
 			 * height for this font size and the small size. */
 			int diff = _default_font_height[size] - _default_font_height[FS_SMALL];
-			pixels = Clamp(min(head->Lowest_Rec_PPEM, 20) + diff, _default_font_height[size], MAX_FONT_SIZE);
+			pixels = Clamp(::min(head->Lowest_Rec_PPEM, 20) + diff, _default_font_height[size], MAX_FONT_SIZE);
 		}
 	}
 
@@ -935,10 +939,20 @@ void InitFreeType(bool monospace)
 		UnloadFace(&_face_large);
 	}
 
+#ifdef __QNXNTO__
+	// Set a default font.
+	if (StrEmpty(_freetype.small_font) && StrEmpty(_freetype.medium_font) && StrEmpty(_freetype.large_font) && StrEmpty(_freetype.mono_font)) {
+		strcpy(_freetype.small_font, "/usr/fonts/font_repository/dejavu/DejaVuSans.ttf");
+		strcpy(_freetype.medium_font, "/usr/fonts/font_repository/dejavu/DejaVuSans.ttf");
+		strcpy(_freetype.large_font, "/usr/fonts/font_repository/dejavu/DejaVuSans.ttf");
+		strcpy(_freetype.mono_font, "/usr/fonts/font_repository/dejavu/DejaVuSansMono.ttf");
+	}
+#else
 	if (StrEmpty(_freetype.small_font) && StrEmpty(_freetype.medium_font) && StrEmpty(_freetype.large_font) && StrEmpty(_freetype.mono_font)) {
 		DEBUG(freetype, 1, "No font faces specified, using sprite fonts instead");
 		return;
 	}
+#endif
 
 	if (_library == NULL) {
 		if (FT_Init_FreeType(&_library) != FT_Err_Ok) {
@@ -1170,8 +1184,8 @@ const Sprite *GetGlyph(FontSize size, WChar key)
 	aa = (slot->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY);
 
 	/* Add 1 pixel for the shadow on the medium font. Our sprite must be at least 1x1 pixel */
-	width  = max(1, slot->bitmap.width + (size == FS_NORMAL));
-	height = max(1, slot->bitmap.rows  + (size == FS_NORMAL));
+	width  = ::max(1, slot->bitmap.width + (size == FS_NORMAL));
+	height = ::max(1, slot->bitmap.rows  + (size == FS_NORMAL));
 
 	/* Limit glyph size to prevent overflows later on. */
 	if (width > 256 || height > 256) usererror("Font glyph is too large");

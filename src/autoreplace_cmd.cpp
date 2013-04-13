@@ -105,7 +105,7 @@ void CheckCargoCapacity(Vehicle *v)
 		for (Vehicle *dest = v; dest != NULL && to_spread != 0; dest = dest->Next()) {
 			if (dest->cargo.Count() >= dest->cargo_cap || dest->cargo_type != src->cargo_type) continue;
 
-			uint amount = min(to_spread, dest->cargo_cap - dest->cargo.Count());
+			uint amount = ::min(to_spread, dest->cargo_cap - dest->cargo.Count());
 			src->cargo.Shift(amount, &dest->cargo);
 			to_spread -= amount;
 		}
@@ -142,7 +142,7 @@ static void TransferCargo(Vehicle *old_veh, Vehicle *new_head, bool part_of_chai
 			}
 			if (dest->cargo_type != src->cargo_type) continue;
 
-			uint amount = min(src->cargo.Count(), dest->cargo_cap - dest->cargo.Count());
+			uint amount = ::min(src->cargo.Count(), dest->cargo_cap - dest->cargo.Count());
 			if (amount <= 0) continue;
 
 			src->cargo.Shift(amount, &dest->cargo);

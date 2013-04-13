@@ -54,7 +54,7 @@ struct EndGameHighScoreBaseWindow : Window {
 	/** Return the coordinate of the screen such that a window of 640x480 is centered at the screen. */
 	Point GetTopLeft640x480()
 	{
-		Point pt = {max(0, (_screen.width  / 2) - (640 / 2)), max(0, (_screen.height / 2) - (480 / 2))};
+		Point pt = {::max(0, (_screen.width  / 2) - (640 / 2)), ::max(0, (_screen.height / 2) - (480 / 2))};
 		return pt;
 	}
 

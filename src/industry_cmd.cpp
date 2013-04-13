@@ -153,7 +153,7 @@ Industry::~Industry()
 	}
 
 	if (GetIndustrySpec(this->type)->behaviour & INDUSTRYBEH_PLANT_FIELDS) {
-		TileArea ta(this->location.tile - TileDiffXY(min(TileX(this->location.tile), 21), min(TileY(this->location.tile), 21)), 42, 42);
+		TileArea ta(this->location.tile - TileDiffXY(::min(TileX(this->location.tile), 21), ::min(TileY(this->location.tile), 21)), 42, 42);
 		ta.ClampToMap();
 
 		/* Remove the farmland and convert it to regular tiles over time. */
@@ -497,7 +497,7 @@ static void TransportIndustryGoods(TileIndex tile)
 	StationFinder stations(i->location);
 
 	for (uint j = 0; j < lengthof(i->produced_cargo_waiting); j++) {
-		uint cw = min(i->produced_cargo_waiting[j], 255);
+		uint cw = ::min(i->produced_cargo_waiting[j], 255);
 		if (cw > indspec->minimal_cargo && i->produced_cargo[j] != CT_INVALID) {
 			i->produced_cargo_waiting[j] -= cw;
 
@@ -999,7 +999,7 @@ static void PlantFarmField(TileIndex tile, IndustryID industry)
 	uint size_x = GB(r, 0, 8);
 	uint size_y = GB(r, 8, 8);
 
-	TileArea ta(tile - TileDiffXY(min(TileX(tile), size_x / 2), min(TileY(tile), size_y / 2)), size_x, size_y);
+	TileArea ta(tile - TileDiffXY(::min(TileX(tile), size_x / 2), ::min(TileY(tile), size_y / 2)), size_x, size_y);
 	ta.ClampToMap();
 
 	if (ta.w == 0 || ta.h == 0) return;
@@ -1088,7 +1088,7 @@ static void ChopLumberMillTrees(Industry *i)
 
 	TileIndex tile = i->location.tile;
 	if (CircularTileSearch(&tile, 40, SearchLumberMillTrees, NULL)) { // 40x40 tiles  to search.
-		i->produced_cargo_waiting[0] = min(0xffff, i->produced_cargo_waiting[0] + 45); // Found a tree, add according value to waiting cargo.
+		i->produced_cargo_waiting[0] = ::min(0xffff, i->produced_cargo_waiting[0] + 45); // Found a tree, add according value to waiting cargo.
 	}
 }
 
@@ -1114,8 +1114,8 @@ static void ProduceIndustryGoods(Industry *i)
 		if (HasBit(indsp->callback_mask, CBM_IND_PRODUCTION_256_TICKS)) IndustryProductionCallback(i, 1);
 
 		IndustryBehaviour indbehav = indsp->behaviour;
-		i->produced_cargo_waiting[0] = min(0xffff, i->produced_cargo_waiting[0] + i->production_rate[0]);
-		i->produced_cargo_waiting[1] = min(0xffff, i->produced_cargo_waiting[1] + i->production_rate[1]);
+		i->produced_cargo_waiting[0] = ::min(0xffff, i->produced_cargo_waiting[0] + i->production_rate[0]);
+		i->produced_cargo_waiting[1] = ::min(0xffff, i->produced_cargo_waiting[1] + i->production_rate[1]);
 
 		if ((indbehav & INDUSTRYBEH_PLANT_FIELDS) != 0) {
 			uint16 cb_res = CALLBACK_FAILED;
@@ -1631,8 +1631,8 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 
 	/* don't use smooth economy for industries using production related callbacks */
 	if (indspec->UsesSmoothEconomy()) {
-		i->production_rate[0] = min((RandomRange(256) + 128) * i->production_rate[0] >> 8, 255);
-		i->production_rate[1] = min((RandomRange(256) + 128) * i->production_rate[1] >> 8, 255);
+		i->production_rate[0] = ::min((RandomRange(256) + 128) * i->production_rate[0] >> 8, 255);
+		i->production_rate[1] = ::min((RandomRange(256) + 128) * i->production_rate[1] >> 8, 255);
 	}
 
 	i->town = t;
@@ -2076,7 +2076,7 @@ void IndustryBuildData::MonthlyLoop()
 
 	/* To prevent running out of unused industries for the player to connect,
 	 * add a fraction of new industries each month, but only if the manager can keep up. */
-	uint max_behind = 1 + min(99u, ScaleByMapSize(3)); // At most 2 industries for small maps, and 100 at the biggest map (about 6 months industry build attempts).
+	uint max_behind = 1 + ::min(99u, ScaleByMapSize(3)); // At most 2 industries for small maps, and 100 at the biggest map (about 6 months industry build attempts).
 	if (GetCurrentTotalNumberOfIndustries() + max_behind >= (this->wanted_inds >> 16)) {
 		this->wanted_inds += ScaleByMapSize(NEWINDS_PER_MONTH);
 	}
@@ -2144,7 +2144,7 @@ static void UpdateIndustryStatistics(Industry *i)
 			byte pct = 0;
 			if (i->this_month_production[j] != 0) {
 				i->last_prod_year = _cur_year;
-				pct = min(i->this_month_transported[j] * 256 / i->this_month_production[j], 255);
+				pct = ::min(i->this_month_transported[j] * 256 / i->this_month_production[j], 255);
 			}
 			i->last_month_pct_transported[j] = pct;
 
@@ -2167,8 +2167,8 @@ void Industry::RecomputeProductionMultipliers()
 	assert(!indspec->UsesSmoothEconomy());
 
 	/* Rates are rounded up, so e.g. oilrig always produces some passengers */
-	this->production_rate[0] = min(CeilDiv(indspec->production_rate[0] * this->prod_level, PRODLEVEL_DEFAULT), 0xFF);
-	this->production_rate[1] = min(CeilDiv(indspec->production_rate[1] * this->prod_level, PRODLEVEL_DEFAULT), 0xFF);
+	this->production_rate[0] = ::min(CeilDiv(indspec->production_rate[0] * this->prod_level, PRODLEVEL_DEFAULT), 0xFF);
+	this->production_rate[1] = ::min(CeilDiv(indspec->production_rate[1] * this->prod_level, PRODLEVEL_DEFAULT), 0xFF);
 }
 
 
@@ -2285,10 +2285,10 @@ void IndustryBuildData::TryBuildNewIndustry()
 		const Industry *ind = PlaceIndustry(it, IACT_RANDOMCREATION, false);
 		if (ind == NULL) {
 			this->builddata[it].wait_count = this->builddata[it].max_wait + 1; // Compensate for decrementing below.
-			this->builddata[it].max_wait = min(1000, this->builddata[it].max_wait + 2);
+			this->builddata[it].max_wait = ::min(1000, this->builddata[it].max_wait + 2);
 		} else {
 			AdvertiseIndustryOpening(ind);
-			this->builddata[it].max_wait = max(this->builddata[it].max_wait / 2, 1); // Reduce waiting time of the industry type.
+			this->builddata[it].max_wait = ::max(this->builddata[it].max_wait / 2, 1); // Reduce waiting time of the industry type.
 		}
 	}
 
@@ -2521,7 +2521,7 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 				/* 4.5% chance for 3-23% (or 1 unit for very low productions) production change,
 				 * determined by mult value. If mult = 1 prod. increases, else (-1) it decreases. */
 				if (Chance16I(1, 22, r >> 16)) {
-					new_prod += mult * (max(((RandomRange(50) + 10) * old_prod) >> 8, 1U));
+					new_prod += mult * (::max(((RandomRange(50) + 10) * old_prod) >> 8, 1U));
 				}
 
 				/* Prevent production to overflow or Oil Rig passengers to be over-"produced" */
@@ -2567,7 +2567,7 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 
 	/* Increase if needed */
 	while (mul-- != 0 && i->prod_level < PRODLEVEL_MAXIMUM) {
-		i->prod_level = min(i->prod_level * 2, PRODLEVEL_MAXIMUM);
+		i->prod_level = ::min(i->prod_level * 2, PRODLEVEL_MAXIMUM);
 		recalculate_multipliers = true;
 		if (str == STR_NULL) str = indspec->production_up_text;
 	}
@@ -2577,7 +2577,7 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 		if (i->prod_level == PRODLEVEL_MINIMUM) {
 			closeit = true;
 		} else {
-			i->prod_level = max(i->prod_level / 2, (int)PRODLEVEL_MINIMUM); // typecast to int required to please MSVC
+			i->prod_level = ::max(i->prod_level / 2, (int)PRODLEVEL_MINIMUM); // typecast to int required to please MSVC
 			recalculate_multipliers = true;
 			if (str == STR_NULL) str = indspec->production_down_text;
 		}
@@ -2668,7 +2668,7 @@ void IndustryDailyLoop()
 
 	uint perc = 3; // Between 3% and 9% chance of creating a new industry.
 	if ((_industry_builder.wanted_inds >> 16) > GetCurrentTotalNumberOfIndustries()) {
-		perc = min(9u, perc + (_industry_builder.wanted_inds >> 16) - GetCurrentTotalNumberOfIndustries());
+		perc = ::min(9u, perc + (_industry_builder.wanted_inds >> 16) - GetCurrentTotalNumberOfIndustries());
 	}
 	for (uint16 j = 0; j < change_loop; j++) {
 		if (Chance16(perc, 100)) {

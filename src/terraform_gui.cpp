@@ -418,13 +418,13 @@ static void CommonRaiseLowerBigLand(TileIndex tile, int mode)
 			/* Raise land */
 			h = MAX_TILE_HEIGHT;
 			TILE_AREA_LOOP(tile2, ta) {
-				h = min(h, TileHeight(tile2));
+				h = ::min(h, TileHeight(tile2));
 			}
 		} else {
 			/* Lower land */
 			h = 0;
 			TILE_AREA_LOOP(tile2, ta) {
-				h = max(h, TileHeight(tile2));
+				h = ::max(h, TileHeight(tile2));
 			}
 		}
 

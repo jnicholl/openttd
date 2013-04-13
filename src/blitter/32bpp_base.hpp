@@ -153,9 +153,9 @@ public:
 		/* Reduce overbright strength */
 		ob /= 2;
 		return Colour(
-		                     r >= 255 ? 255 : min(r + ob * (255 - r) / 256, 255),
-		                     g >= 255 ? 255 : min(g + ob * (255 - g) / 256, 255),
-		                     b >= 255 ? 255 : min(b + ob * (255 - b) / 256, 255),
+		                     r >= 255 ? 255 : ::min(r + ob * (255 - r) / 256, 255),
+		                     g >= 255 ? 255 : ::min(g + ob * (255 - g) / 256, 255),
+		                     b >= 255 ? 255 : ::min(b + ob * (255 - b) / 256, 255),
 		                     colour.a);
 	}
 };

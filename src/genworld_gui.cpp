@@ -1204,7 +1204,7 @@ struct GenerateProgressWindow : public Window {
 
 			case WID_GP_PROGRESS_TEXT:
 				for (uint i = 0; i < GWP_CLASS_COUNT; i++) {
-					size->width = max(size->width, GetStringBoundingBox(_generation_class_table[i]).width);
+					size->width = ::max(size->width, GetStringBoundingBox(_generation_class_table[i]).width);
 				}
 				size->height = FONT_HEIGHT_NORMAL * 2 + WD_PAR_VSEP_NORMAL;
 				break;

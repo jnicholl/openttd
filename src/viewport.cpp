@@ -405,8 +405,8 @@ static Point TranslateXYToTileCoord(const ViewPort *vp, int x, int y)
 
 	int min_coord = _settings_game.construction.freeform_edges ? TILE_SIZE : 0;
 
-	for (int i = 0; i < 5; i++) z = GetSlopePixelZ(Clamp(a + max(z, 4) - 4, min_coord, MapMaxX() * TILE_SIZE - 1), Clamp(b + max(z, 4) - 4, min_coord, MapMaxY() * TILE_SIZE - 1)) / 2;
-	for (int malus = 3; malus > 0; malus--) z = GetSlopePixelZ(Clamp(a + max(z, malus) - malus, min_coord, MapMaxX() * TILE_SIZE - 1), Clamp(b + max(z, malus) - malus, min_coord, MapMaxY() * TILE_SIZE - 1)) / 2;
+	for (int i = 0; i < 5; i++) z = GetSlopePixelZ(Clamp(a + ::max(z, 4) - 4, min_coord, MapMaxX() * TILE_SIZE - 1), Clamp(b + ::max(z, 4) - 4, min_coord, MapMaxY() * TILE_SIZE - 1)) / 2;
+	for (int malus = 3; malus > 0; malus--) z = GetSlopePixelZ(Clamp(a + ::max(z, malus) - malus, min_coord, MapMaxX() * TILE_SIZE - 1), Clamp(b + ::max(z, malus) - malus, min_coord, MapMaxY() * TILE_SIZE - 1)) / 2;
 	for (int i = 0; i < 5; i++) z = GetSlopePixelZ(Clamp(a + z, min_coord, MapMaxX() * TILE_SIZE - 1), Clamp(b + z, min_coord, MapMaxY() * TILE_SIZE - 1)) / 2;
 
 	pt.x = Clamp(a + z, min_coord, MapMaxX() * TILE_SIZE - 1);
@@ -682,10 +682,10 @@ void AddSortableSpriteToDraw(SpriteID image, PaletteID pal, int x, int y, int w,
 
 	if (_draw_bounding_boxes && (image != SPR_EMPTY_BOUNDING_BOX)) {
 		/* Compute maximal extents of sprite and its bounding box */
-		left   = min(left  , RemapCoords(x + w          , y + bb_offset_y, z + bb_offset_z).x);
-		right  = max(right , RemapCoords(x + bb_offset_x, y + h          , z + bb_offset_z).x + 1);
-		top    = min(top   , RemapCoords(x + bb_offset_x, y + bb_offset_y, z + dz         ).y);
-		bottom = max(bottom, RemapCoords(x + w          , y + h          , z + bb_offset_z).y + 1);
+		left   = ::min(left  , RemapCoords(x + w          , y + bb_offset_y, z + bb_offset_z).x);
+		right  = ::max(right , RemapCoords(x + bb_offset_x, y + h          , z + bb_offset_z).x + 1);
+		top    = ::min(top   , RemapCoords(x + bb_offset_x, y + bb_offset_y, z + dz         ).y);
+		bottom = ::max(bottom, RemapCoords(x + w          , y + h          , z + bb_offset_z).y + 1);
 	}
 
 	/* Do not add the sprite to the viewport, if it is outside */
@@ -707,13 +707,13 @@ void AddSortableSpriteToDraw(SpriteID image, PaletteID pal, int x, int y, int w,
 	ps->pal = pal;
 	ps->sub = sub;
 	ps->xmin = x + bb_offset_x;
-	ps->xmax = x + max(bb_offset_x, w) - 1;
+	ps->xmax = x + ::max(bb_offset_x, w) - 1;
 
 	ps->ymin = y + bb_offset_y;
-	ps->ymax = y + max(bb_offset_y, h) - 1;
+	ps->ymax = y + ::max(bb_offset_y, h) - 1;
 
 	ps->zmin = z + bb_offset_z;
-	ps->zmax = z + max(bb_offset_z, dz) - 1;
+	ps->zmax = z + ::max(bb_offset_z, dz) - 1;
 
 	ps->comparison_done = false;
 	ps->first_child = -1;
@@ -1082,7 +1082,7 @@ static void ViewportAddLandscape()
 
 				if (!_settings_game.construction.freeform_edges || (TileX(tile) != 0 && TileY(tile) != 0)) {
 					if (x_cur == ((int)MapMaxX() - 1) * TILE_SIZE || y_cur == ((int)MapMaxY() - 1) * TILE_SIZE) {
-						uint maxh = max<uint>(TileHeight(tile), 1);
+						uint maxh = ::max<uint>(TileHeight(tile), 1);
 						for (uint h = 0; h < maxh; h++) {
 							AddTileSpriteToDraw(SPR_SHADOW_CELL, PAL_NONE, ti.x, ti.y, h * TILE_HEIGHT);
 						}
@@ -1648,11 +1648,11 @@ static void MarkViewportDirty(const ViewPort *vp, int left, int top, int right, 
 	bottom -= vp->virtual_top;
 	if (bottom <= 0) return;
 
-	left = max(0, left - vp->virtual_left);
+	left = ::max(0, left - vp->virtual_left);
 
 	if (left >= vp->virtual_width) return;
 
-	top = max(0, top - vp->virtual_top);
+	top = ::max(0, top - vp->virtual_top);
 
 	if (top >= vp->virtual_height) return;
 
@@ -2438,7 +2438,7 @@ static int CalcHeightdiff(HighLightStyle style, uint distance, TileIndex start_t
 			assert(style_t < lengthof(heightdiff_line_by_dir) - 13);
 			h0 = TileHeight(TILE_ADD(start_tile, ToTileIndexDiff(heightdiff_line_by_dir[style_t])));
 			uint ht = TileHeight(TILE_ADD(start_tile, ToTileIndexDiff(heightdiff_line_by_dir[style_t + 1])));
-			h0 = max(h0, ht);
+			h0 = ::max(h0, ht);
 
 			/* Use lookup table for end-tile based on HighLightStyle direction
 			 * flip around side (lower/upper, left/right) based on distance */
@@ -2446,7 +2446,7 @@ static int CalcHeightdiff(HighLightStyle style, uint distance, TileIndex start_t
 			assert(style_t < lengthof(heightdiff_line_by_dir) - 13);
 			h1 = TileHeight(TILE_ADD(end_tile, ToTileIndexDiff(heightdiff_line_by_dir[12 + style_t])));
 			ht = TileHeight(TILE_ADD(end_tile, ToTileIndexDiff(heightdiff_line_by_dir[12 + style_t + 1])));
-			h1 = max(h1, ht);
+			h1 = ::max(h1, ht);
 			break;
 		}
 	}

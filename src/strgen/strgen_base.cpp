@@ -479,7 +479,7 @@ static uint ResolveCaseName(const char *str, size_t len)
 {
 	/* First get a clean copy of only the case name, then resolve it. */
 	char case_str[CASE_GENDER_LEN];
-	len = min(lengthof(case_str) - 1, len);
+	len = ::min(lengthof(case_str) - 1, len);
 	memcpy(case_str, str, len);
 	case_str[len] = '\0';
 

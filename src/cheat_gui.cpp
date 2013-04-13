@@ -244,9 +244,9 @@ struct CheatWindow : Window {
 			switch (ce->type) {
 				case SLE_BOOL:
 					SetDParam(0, STR_CONFIG_SETTING_ON);
-					width = max(width, GetStringBoundingBox(ce->str).width);
+					width = ::max(width, GetStringBoundingBox(ce->str).width);
 					SetDParam(0, STR_CONFIG_SETTING_OFF);
-					width = max(width, GetStringBoundingBox(ce->str).width);
+					width = ::max(width, GetStringBoundingBox(ce->str).width);
 					break;
 
 				default:
@@ -254,18 +254,18 @@ struct CheatWindow : Window {
 						/* Display date for change date cheat */
 						case STR_CHEAT_CHANGE_DATE:
 							SetDParam(0, ConvertYMDToDate(MAX_YEAR, 11, 31));
-							width = max(width, GetStringBoundingBox(ce->str).width);
+							width = ::max(width, GetStringBoundingBox(ce->str).width);
 							break;
 
 						/* Draw coloured flag for change company cheat */
 						case STR_CHEAT_CHANGE_COMPANY:
 							SetDParamMaxValue(0, MAX_COMPANIES);
-							width = max(width, GetStringBoundingBox(ce->str).width + 10 + 10);
+							width = ::max(width, GetStringBoundingBox(ce->str).width + 10 + 10);
 							break;
 
 						default:
 							SetDParam(0, INT64_MAX);
-							width = max(width, GetStringBoundingBox(ce->str).width);
+							width = ::max(width, GetStringBoundingBox(ce->str).width);
 							break;
 					}
 					break;

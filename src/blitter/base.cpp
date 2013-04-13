@@ -42,11 +42,11 @@ void Blitter::DrawLine(void *video, int x, int y, int x2, int y2, int screen_wid
 		return;
 	}
 
-	int frac_diff = width * max(dx, dy);
+	int frac_diff = width * ::max(dx, dy);
 	if (width > 1) {
 		/* compute frac_diff = width * sqrt(dx*dx + dy*dy)
 		 * Start interval:
-		 *    max(dx, dy) <= sqrt(dx*dx + dy*dy) <= sqrt(2) * max(dx, dy) <= 3/2 * max(dx, dy) */
+		 *    ::max(dx, dy) <= sqrt(dx*dx + dy*dy) <= sqrt(2) * ::max(dx, dy) <= 3/2 * ::max(dx, dy) */
 		int frac_sq = width * width * (dx * dx + dy * dy);
 		int frac_max = 3 * frac_diff / 2;
 		while (frac_diff < frac_max) {

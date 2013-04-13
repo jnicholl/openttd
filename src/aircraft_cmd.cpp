@@ -626,13 +626,13 @@ static int UpdateAircraftSpeed(Aircraft *v, uint speed_limit = SPEED_LIMIT_NONE,
 	 * speeds to that aircraft do not get to taxi speed straight after
 	 * touchdown. */
 	if (!hard_limit && v->cur_speed > speed_limit) {
-		speed_limit = v->cur_speed - max(1, ((v->cur_speed * v->cur_speed) / 16384) / _settings_game.vehicle.plane_speed);
+		speed_limit = v->cur_speed - ::max(1, ((v->cur_speed * v->cur_speed) / 16384) / _settings_game.vehicle.plane_speed);
 	}
 
-	spd = min(v->cur_speed + (spd >> 8) + (v->subspeed < t), speed_limit);
+	spd = ::min(v->cur_speed + (spd >> 8) + (v->subspeed < t), speed_limit);
 
 	/* adjust speed for broken vehicles */
-	if (v->vehstatus & VS_AIRCRAFT_BROKEN) spd = min(spd, SPEED_LIMIT_BROKEN);
+	if (v->vehstatus & VS_AIRCRAFT_BROKEN) spd = ::min(spd, SPEED_LIMIT_BROKEN);
 
 	/* updates statusbar only if speed have changed to save CPU time */
 	if (spd != v->cur_speed) {
@@ -682,7 +682,7 @@ int GetAircraftFlyingAltitude(const Aircraft *v)
 	}
 
 	/* Make faster planes fly higher so that they can overtake slower ones */
-	base_altitude += min(20 * (v->vcache.cached_max_speed / 200), 90);
+	base_altitude += ::min(20 * (v->vcache.cached_max_speed / 200), 90);
 
 	return base_altitude;
 }
@@ -811,7 +811,7 @@ static bool AircraftController(Aircraft *v)
 					v->cur_speed = 0;
 					return true;
 				}
-				SetAircraftPosition(v, v->x_pos, v->y_pos, min(v->z_pos + count, z_dest));
+				SetAircraftPosition(v, v->x_pos, v->y_pos, ::min(v->z_pos + count, z_dest));
 			}
 		}
 		return false;
@@ -845,9 +845,9 @@ static bool AircraftController(Aircraft *v)
 			count = UpdateAircraftSpeed(v);
 			if (count > 0) {
 				if (v->z_pos > z) {
-					SetAircraftPosition(v, v->x_pos, v->y_pos, max(v->z_pos - count, z));
+					SetAircraftPosition(v, v->x_pos, v->y_pos, ::max(v->z_pos - count, z));
 				} else {
-					SetAircraftPosition(v, v->x_pos, v->y_pos, min(v->z_pos + count, z));
+					SetAircraftPosition(v, v->x_pos, v->y_pos, ::min(v->z_pos + count, z));
 				}
 			}
 		}
@@ -961,7 +961,7 @@ static bool AircraftController(Aircraft *v)
 		int z = v->z_pos;
 
 		if (amd.flag & AMED_TAKEOFF) {
-			z = min(z + 2, GetAircraftFlyingAltitude(v));
+			z = ::min(z + 2, GetAircraftFlyingAltitude(v));
 		}
 
 		/* Let the plane drop from normal flight altitude to holding pattern altitude */
@@ -982,7 +982,7 @@ static bool AircraftController(Aircraft *v)
 
 			/* We're not flying below our destination, right? */
 			assert(curz <= z);
-			int t = max(1U, dist - 4);
+			int t = ::max(1U, dist - 4);
 			int delta = z - curz;
 
 			/* Only start lowering when we're sufficiently close for a 1:1 glide */

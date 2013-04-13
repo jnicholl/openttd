@@ -26,7 +26,7 @@
 #define TTD_BIG_ENDIAN 1
 
 /* Windows has always LITTLE_ENDIAN */
-#if defined(WIN32) || defined(__OS2__) || defined(WIN64)
+#if defined(WIN32) || defined(__OS2__) || defined(WIN64) || defined(__QNXNTO__)
 	#define TTD_ENDIAN TTD_LITTLE_ENDIAN
 #elif !defined(TESTING)
 	/* Else include endian[target/host].h, which has the endian-type, autodetected by the Makefile */

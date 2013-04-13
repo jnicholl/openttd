@@ -45,7 +45,7 @@ static int CDECL vseprintf(char *str, const char *last, const char *format, va_l
 {
 	ptrdiff_t diff = last - str;
 	if (diff < 0) return 0;
-	return min((int)diff, vsnprintf(str, diff + 1, format, ap));
+	return ::min((int)diff, vsnprintf(str, diff + 1, format, ap));
 }
 
 /**
@@ -573,7 +573,7 @@ size_t Utf8TrimString(char *s, size_t maxlen)
 #include "core/math_func.hpp"
 char *strndup(const char *s, size_t len)
 {
-	len = min(strlen(s), len);
+	len = ::min(strlen(s), len);
 	char *tmp = CallocT<char>(len + 1);
 	memcpy(tmp, s, len);
 	return tmp;

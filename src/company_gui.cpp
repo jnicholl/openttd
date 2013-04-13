@@ -108,11 +108,11 @@ struct ExpensesList {
 			ExpensesType et = this->et[i];
 			if (et == INVALID_EXPENSES) {
 				if (!invalid_expenses_measured) {
-					width = max(width, GetStringBoundingBox(STR_FINANCES_TOTAL_CAPTION).width);
+					width = ::max(width, GetStringBoundingBox(STR_FINANCES_TOTAL_CAPTION).width);
 					invalid_expenses_measured = true;
 				}
 			} else {
-				width = max(width, GetStringBoundingBox(STR_FINANCES_SECTION_CONSTRUCTION + et).width);
+				width = ::max(width, GetStringBoundingBox(STR_FINANCES_SECTION_CONSTRUCTION + et).width);
 			}
 		}
 		return width;
@@ -320,7 +320,7 @@ struct CompanyFinancesWindow : Window {
 			case WID_CF_LOAN_VALUE:
 			case WID_CF_TOTAL_VALUE:
 				SetDParamMaxValue(0, CompanyFinancesWindow::max_money);
-				size->width = max(GetStringBoundingBox(STR_FINANCES_NEGATIVE_INCOME).width, GetStringBoundingBox(STR_FINANCES_POSITIVE_INCOME).width) + padding.width;
+				size->width = ::max(GetStringBoundingBox(STR_FINANCES_NEGATIVE_INCOME).width, GetStringBoundingBox(STR_FINANCES_POSITIVE_INCOME).width) + padding.width;
 				break;
 
 			case WID_CF_MAXLOAN_GAP:
@@ -340,7 +340,7 @@ struct CompanyFinancesWindow : Window {
 			case WID_CF_EXPS_PRICE2:
 			case WID_CF_EXPS_PRICE3: {
 				const Company *c = Company::Get((CompanyID)this->window_number);
-				int age = min(_cur_year - c->inaugurated_year, 2);
+				int age = ::min(_cur_year - c->inaugurated_year, 2);
 				int wid_offset = widget - WID_CF_EXPS_PRICE1;
 				if (wid_offset <= age) {
 					DrawYearColumn(r, _cur_year - (age - wid_offset), c->yearly_expenses + (age - wid_offset));
@@ -453,7 +453,7 @@ struct CompanyFinancesWindow : Window {
 	{
 		const Company *c = Company::Get((CompanyID)this->window_number);
 		if (c->money > CompanyFinancesWindow::max_money) {
-			CompanyFinancesWindow::max_money = max(c->money * 2, CompanyFinancesWindow::max_money * 4);
+			CompanyFinancesWindow::max_money = ::max(c->money * 2, CompanyFinancesWindow::max_money * 4);
 			this->SetupWidgets();
 			this->ReInit();
 		}
@@ -526,7 +526,7 @@ public:
 
 	uint Height(uint width) const
 	{
-		return max(FONT_HEIGHT_NORMAL, (byte)14);
+		return ::max(FONT_HEIGHT_NORMAL, (byte)14);
 	}
 
 	bool Selectable() const
@@ -538,7 +538,7 @@ public:
 	{
 		bool rtl = _current_text_dir == TD_RTL;
 		DrawSprite(SPR_VEH_BUS_SIDE_VIEW, PALETTE_RECOLOUR_START + this->result, rtl ? right - 16 : left + 16, top + 7);
-		DrawString(rtl ? left + 2 : left + 32, rtl ? right - 32 : right - 2, top + max(0, 13 - FONT_HEIGHT_NORMAL), this->String(), sel ? TC_WHITE : TC_BLACK);
+		DrawString(rtl ? left + 2 : left + 32, rtl ? right - 32 : right - 2, top + ::max(0, 13 - FONT_HEIGHT_NORMAL), this->String(), sel ? TC_WHITE : TC_BLACK);
 	}
 };
 
@@ -588,7 +588,7 @@ public:
 
 		this->square = GetSpriteSize(SPR_SQUARE);
 		this->box    = maxdim(GetSpriteSize(SPR_BOX_CHECKED), GetSpriteSize(SPR_BOX_EMPTY));
-		this->line_height = max(max(this->square.height, this->box.height), (uint)FONT_HEIGHT_NORMAL) + 4;
+		this->line_height = ::max(::max(this->square.height, this->box.height), (uint)FONT_HEIGHT_NORMAL) + 4;
 
 		this->InitNested(desc, company);
 		this->owner = company;
@@ -605,7 +605,7 @@ public:
 				for (LiveryScheme scheme = LS_DEFAULT; scheme < LS_END; scheme++) {
 					d = maxdim(d, GetStringBoundingBox(STR_LIVERY_DEFAULT + scheme));
 				}
-				size->width = max(size->width, 5 + this->box.width + d.width + WD_FRAMERECT_RIGHT);
+				size->width = ::max(size->width, 5 + this->box.width + d.width + WD_FRAMERECT_RIGHT);
 				break;
 			}
 
@@ -630,7 +630,7 @@ public:
 			case WID_SCL_PRI_COL_DROPDOWN: {
 				int padding = this->square.width + NWidgetScrollbar::GetVerticalDimension().width + 10;
 				for (const StringID *id = _colour_dropdown; id != endof(_colour_dropdown); id++) {
-					size->width = max(size->width, GetStringBoundingBox(*id).width + padding);
+					size->width = ::max(size->width, GetStringBoundingBox(*id).width + padding);
 				}
 				break;
 			}
@@ -1125,7 +1125,7 @@ public:
 		number_dim.width += WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT + arrows_width;
 		number_dim.height += WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 		/* Compute width of both buttons. */
-		yesno_dim.width = max(yesno_dim.width, number_dim.width);
+		yesno_dim.width = ::max(yesno_dim.width, number_dim.width);
 		number_dim.width = yesno_dim.width - arrows_width;
 
 		this->yesno_dim = yesno_dim;
@@ -1618,51 +1618,51 @@ struct CompanyInfrastructureWindow : Window
 			case WID_CI_RAIL_DESC: {
 				uint lines = 1;
 
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_RAIL_SECT).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_RAIL_SECT).width);
 
 				for (RailType rt = RAILTYPE_BEGIN; rt < RAILTYPE_END; rt++) {
 					if (HasBit(this->railtypes, rt)) {
 						lines++;
 						SetDParam(0, GetRailTypeInfo(rt)->strings.name);
-						size->width = max(size->width, GetStringBoundingBox(STR_WHITE_STRING).width + WD_FRAMERECT_LEFT);
+						size->width = ::max(size->width, GetStringBoundingBox(STR_WHITE_STRING).width + WD_FRAMERECT_LEFT);
 					}
 				}
 				if (this->railtypes != RAILTYPES_NONE) {
 					lines++;
-					size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_SIGNALS).width + WD_FRAMERECT_LEFT);
+					size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_SIGNALS).width + WD_FRAMERECT_LEFT);
 				}
 
-				size->height = max(size->height, lines * FONT_HEIGHT_NORMAL);
+				size->height = ::max(size->height, lines * FONT_HEIGHT_NORMAL);
 				break;
 			}
 
 			case WID_CI_ROAD_DESC: {
 				uint lines = 1;
 
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_ROAD_SECT).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_ROAD_SECT).width);
 
 				if (HasBit(this->roadtypes, ROADTYPE_ROAD)) {
 					lines++;
-					size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_ROAD).width + WD_FRAMERECT_LEFT);
+					size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_ROAD).width + WD_FRAMERECT_LEFT);
 				}
 				if (HasBit(this->roadtypes, ROADTYPE_TRAM)) {
 					lines++;
-					size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_TRAMWAY).width + WD_FRAMERECT_LEFT);
+					size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_TRAMWAY).width + WD_FRAMERECT_LEFT);
 				}
 
-				size->height = max(size->height, lines * FONT_HEIGHT_NORMAL);
+				size->height = ::max(size->height, lines * FONT_HEIGHT_NORMAL);
 				break;
 			}
 
 			case WID_CI_WATER_DESC:
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_WATER_SECT).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_CANALS).width + WD_FRAMERECT_LEFT);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_WATER_SECT).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_CANALS).width + WD_FRAMERECT_LEFT);
 				break;
 
 			case WID_CI_STATION_DESC:
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_STATION_SECT).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_STATIONS).width + WD_FRAMERECT_LEFT);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_AIRPORTS).width + WD_FRAMERECT_LEFT);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_STATION_SECT).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_STATIONS).width + WD_FRAMERECT_LEFT);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_AIRPORTS).width + WD_FRAMERECT_LEFT);
 				break;
 
 			case WID_CI_RAIL_COUNT:
@@ -1675,35 +1675,35 @@ struct CompanyInfrastructureWindow : Window
 				Money max_cost = 10000; // Some random number to reserve enough space.
 				uint32 rail_total = c->infrastructure.GetRailTotal();
 				for (RailType rt = RAILTYPE_BEGIN; rt < RAILTYPE_END; rt++) {
-					max_val = max(max_val, c->infrastructure.rail[rt]);
-					max_cost = max(max_cost, RailMaintenanceCost(rt, c->infrastructure.rail[rt], rail_total));
+					max_val = ::max(max_val, c->infrastructure.rail[rt]);
+					max_cost = ::max(max_cost, RailMaintenanceCost(rt, c->infrastructure.rail[rt], rail_total));
 				}
-				max_val = max(max_val, c->infrastructure.signal);
-				max_cost = max(max_cost, SignalMaintenanceCost(c->infrastructure.signal));
+				max_val = ::max(max_val, c->infrastructure.signal);
+				max_cost = ::max(max_cost, SignalMaintenanceCost(c->infrastructure.signal));
 				for (RoadType rt = ROADTYPE_BEGIN; rt < ROADTYPE_END; rt++) {
-					max_val = max(max_val, c->infrastructure.road[rt]);
-					max_cost = max(max_cost, RoadMaintenanceCost(rt, c->infrastructure.road[rt]));
+					max_val = ::max(max_val, c->infrastructure.road[rt]);
+					max_cost = ::max(max_cost, RoadMaintenanceCost(rt, c->infrastructure.road[rt]));
 				}
-				max_val = max(max_val, c->infrastructure.water);
-				max_cost = max(max_cost, CanalMaintenanceCost(c->infrastructure.water));
-				max_val = max(max_val, c->infrastructure.station);
-				max_cost = max(max_cost, StationMaintenanceCost(c->infrastructure.station));
-				max_val = max(max_val, c->infrastructure.airport);
-				max_cost = max(max_cost, AirportMaintenanceCost(c->index));
+				max_val = ::max(max_val, c->infrastructure.water);
+				max_cost = ::max(max_cost, CanalMaintenanceCost(c->infrastructure.water));
+				max_val = ::max(max_val, c->infrastructure.station);
+				max_cost = ::max(max_cost, StationMaintenanceCost(c->infrastructure.station));
+				max_val = ::max(max_val, c->infrastructure.airport);
+				max_cost = ::max(max_cost, AirportMaintenanceCost(c->index));
 
 				SetDParamMaxValue(0, max_val);
 				SetDParamMaxValue(1, max_cost * 12); // Convert to per year
-				size->width = max(size->width, GetStringBoundingBox(_settings_game.economy.infrastructure_maintenance ? STR_COMPANY_INFRASTRUCTURE_VIEW_COST : STR_WHITE_COMMA).width + 20); // Reserve some wiggle room.
+				size->width = ::max(size->width, GetStringBoundingBox(_settings_game.economy.infrastructure_maintenance ? STR_COMPANY_INFRASTRUCTURE_VIEW_COST : STR_WHITE_COMMA).width + 20); // Reserve some wiggle room.
 
 				if (_settings_game.economy.infrastructure_maintenance) {
 					SetDParamMaxValue(0, this->GetTotalMaintenanceCost() * 12); // Convert to per year
 					this->total_width = GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_TOTAL).width + 20;
-					size->width = max(size->width, this->total_width);
+					size->width = ::max(size->width, this->total_width);
 				}
 
 				/* Set height of the total line. */
 				if (widget == WID_CI_TOTAL) {
-					size->height = _settings_game.economy.infrastructure_maintenance ? max(size->height, EXP_LINESPACE + FONT_HEIGHT_NORMAL) : 0;
+					size->height = _settings_game.economy.infrastructure_maintenance ? ::max(size->height, EXP_LINESPACE + FONT_HEIGHT_NORMAL) : 0;
 				}
 				break;
 			}
@@ -2079,18 +2079,18 @@ struct CompanyWindow : Window
 			case WID_C_DESC_VEHICLE_COUNTS:
 				SetDParamMaxValue(0, 5000); // Maximum number of vehicles
 				for (uint i = 0; i < lengthof(_company_view_vehicle_count_strings); i++) {
-					size->width = max(size->width, GetStringBoundingBox(_company_view_vehicle_count_strings[i]).width);
+					size->width = ::max(size->width, GetStringBoundingBox(_company_view_vehicle_count_strings[i]).width);
 				}
 				break;
 
 			case WID_C_DESC_INFRASTRUCTURE_COUNTS:
 				SetDParamMaxValue(0, UINT_MAX);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_WATER).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_STATION).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT).width);
-				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_NONE).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_WATER).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_STATION).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT).width);
+				size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_NONE).width);
 				break;
 
 			case WID_C_DESC_OWNERS: {
@@ -2100,7 +2100,7 @@ struct CompanyWindow : Window
 					SetDParamMaxValue(0, 75);
 					SetDParam(1, c2->index);
 
-					size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
+					size->width = ::max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
 				}
 				break;
 			}

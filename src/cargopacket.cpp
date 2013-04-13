@@ -204,7 +204,7 @@ void CargoList<Tinst>::AddToCache(const CargoPacket *cp)
 template <class Tinst>
 uint CargoList<Tinst>::Truncate(uint max_move)
 {
-	max_move = min(this->count, max_move);
+	max_move = ::min(this->count, max_move);
 	this->PopCargo(CargoRemoval<Tinst>(static_cast<Tinst *>(this), max_move));
 	return max_move;
 }
@@ -459,7 +459,7 @@ void VehicleCargoList::InvalidateCache()
  */
 uint VehicleCargoList::Reassign(uint max_move, MoveToAction from, MoveToAction to)
 {
-	max_move = min(this->action_counts[from], max_move);
+	max_move = ::min(this->action_counts[from], max_move);
 	assert(Delta((int)from, (int)to) == 1);
 	this->action_counts[from] -= max_move;
 	this->action_counts[to] += max_move;
@@ -474,7 +474,7 @@ uint VehicleCargoList::Reassign(uint max_move, MoveToAction from, MoveToAction t
  */
 uint VehicleCargoList::Return(uint max_move, StationCargoList *dest)
 {
-	max_move = min(this->action_counts[MTA_LOAD], max_move);
+	max_move = ::min(this->action_counts[MTA_LOAD], max_move);
 	this->PopCargo(CargoReturn(this, dest, max_move));
 	return max_move;
 }
@@ -487,7 +487,7 @@ uint VehicleCargoList::Return(uint max_move, StationCargoList *dest)
  */
 uint VehicleCargoList::Shift(uint max_move, VehicleCargoList *dest)
 {
-	max_move = min(this->count, max_move);
+	max_move = ::min(this->count, max_move);
 	this->PopCargo(CargoShift(this, dest, max_move));
 	return max_move;
 }
@@ -504,12 +504,12 @@ uint VehicleCargoList::Unload(uint max_move, StationCargoList *dest, CargoPaymen
 {
 	uint moved = 0;
 	if (this->action_counts[MTA_TRANSFER] > 0) {
-		uint move = min(this->action_counts[MTA_TRANSFER], max_move);
+		uint move = ::min(this->action_counts[MTA_TRANSFER], max_move);
 		this->ShiftCargo(CargoTransfer(this, dest, move, payment));
 		moved += move;
 	}
 	if (this->action_counts[MTA_TRANSFER] == 0 && this->action_counts[MTA_DELIVER] > 0 && moved < max_move) {
-		uint move = min(this->action_counts[MTA_DELIVER], max_move - moved);
+		uint move = ::min(this->action_counts[MTA_DELIVER], max_move - moved);
 		this->ShiftCargo(CargoDelivery(this, move, payment));
 		moved += move;
 	}
@@ -552,7 +552,7 @@ void StationCargoList::Append(CargoPacket *cp)
  */
 uint StationCargoList::Reserve(uint max_move, VehicleCargoList *dest, TileIndex load_place)
 {
-	max_move = min(this->count, max_move);
+	max_move = ::min(this->count, max_move);
 	this->ShiftCargo(CargoReservation(this, dest, max_move, load_place));
 	return max_move;
 }
@@ -566,12 +566,12 @@ uint StationCargoList::Reserve(uint max_move, VehicleCargoList *dest, TileIndex 
  */
 uint StationCargoList::Load(uint max_move, VehicleCargoList *dest, TileIndex load_place)
 {
-	uint move = min(dest->ActionCount(VehicleCargoList::MTA_LOAD), max_move);
+	uint move = ::min(dest->ActionCount(VehicleCargoList::MTA_LOAD), max_move);
 	if (move > 0) {
 		this->reserved_count -= move;
 		dest->Reassign(move, VehicleCargoList::MTA_LOAD, VehicleCargoList::MTA_KEEP);
 	} else {
-		move = min(this->count, max_move);
+		move = ::min(this->count, max_move);
 		this->ShiftCargo(CargoLoad(this, dest, move, load_place));
 	}
 	return move;

@@ -232,7 +232,7 @@ static inline void GfxDoDrawLine(void *video, int x, int y, int x2, int y2, int 
 
 	/* prevent integer overflows. */
 	int margin = 1;
-	while (INT_MAX / abs(grade_y) < max(abs(x), abs(screen_width - x))) {
+	while (INT_MAX / abs(grade_y) < ::max(abs(x), abs(screen_width - x))) {
 		grade_y /= 2;
 		grade_x /= 2;
 		margin  *= 2; // account for rounding errors
@@ -522,13 +522,13 @@ static int GetStringWidth(const WChar *str, FontSize start_fontsize)
 				case SCC_TINYFONT: size = FS_SMALL; break;
 				case SCC_BIGFONT:  size = FS_LARGE; break;
 				case '\n':
-					max_width = max(max_width, width);
+					max_width = ::max(max_width, width);
 					break;
 			}
 		}
 	}
 
-	return max(max_width, width);
+	return ::max(max_width, width);
 }
 
 /**
@@ -609,7 +609,7 @@ static int DrawString(int left, int right, int top, char *str, const char *last,
 			 * but once SETX is used you cannot be sure the actual content of the
 			 * string is centered, so it doesn't really matter. */
 			align = SA_LEFT | SA_FORCE;
-			initial_left = left = max(left, (left + right - (int)GetStringBoundingBox(str).width) / 2);
+			initial_left = left = ::max(left, (left + right - (int)GetStringBoundingBox(str).width) / 2);
 		}
 
 		/* We add the begin of the string, but don't add it twice */
@@ -670,8 +670,8 @@ static int DrawString(int left, int right, int top, char *str, const char *last,
 				NOT_REACHED();
 		}
 
-		min_left  = min(left, min_left);
-		max_right = max(right, max_right);
+		min_left  = ::min(left, min_left);
+		max_right = ::max(right, max_right);
 
 		ReallyDoDrawString(to_draw, left, top, params, !truncate);
 		if (underline) {
@@ -859,7 +859,7 @@ static int GetMultilineStringHeight(const char *src, int num, FontSize start_fon
 			case SCC_SETXY:    src++; y = (int)*src++;              break;
 			case SCC_TINYFONT: fh = GetCharacterHeight(FS_SMALL);   break;
 			case SCC_BIGFONT:  fh = GetCharacterHeight(FS_LARGE);   break;
-			default:           maxy = max<int>(maxy, y + fh);       break;
+			default:           maxy = ::max<int>(maxy, y + fh);       break;
 		}
 	}
 }
@@ -1094,10 +1094,10 @@ Dimension GetStringBoundingBox(const char *str, FontSize start_fontsize)
 			br.width += GetCharacterWidth(size, c);
 		} else {
 			switch (c) {
-				case SCC_SETX: br.width = max((uint)*str++, br.width); break;
+				case SCC_SETX: br.width = ::max((uint)*str++, br.width); break;
 				case SCC_SETXY:
-					br.width  = max((uint)*str++, br.width);
-					br.height = max((uint)*str++, br.height);
+					br.width  = ::max((uint)*str++, br.width);
+					br.height = ::max((uint)*str++, br.height);
 					break;
 				case SCC_TINYFONT: size = FS_SMALL; break;
 				case SCC_BIGFONT:  size = FS_LARGE; break;
@@ -1111,7 +1111,7 @@ Dimension GetStringBoundingBox(const char *str, FontSize start_fontsize)
 	}
 	br.height += GetCharacterHeight(size);
 
-	br.width  = max(br.width, max_width);
+	br.width  = ::max(br.width, max_width);
 	return br;
 }
 
@@ -1242,8 +1242,8 @@ Dimension GetSpriteSize(SpriteID sprid, Point *offset, ZoomLevel zoom)
 	}
 
 	Dimension d;
-	d.width  = max<int>(0, UnScaleByZoom(sprite->x_offs + sprite->width, zoom));
-	d.height = max<int>(0, UnScaleByZoom(sprite->y_offs + sprite->height, zoom));
+	d.width  = ::max<int>(0, UnScaleByZoom(sprite->x_offs + sprite->width, zoom));
+	d.height = ::max<int>(0, UnScaleByZoom(sprite->y_offs + sprite->height, zoom));
 	return d;
 }
 
@@ -1298,10 +1298,10 @@ static void GfxMainBlitterViewport(const Sprite *sprite, int x, int y, BlitterMo
 	Blitter::BlitterParams bp;
 
 	/* Amount of pixels to clip from the source sprite */
-	int clip_left   = (sub != NULL ? max(0,                   -sprite->x_offs + sub->left * ZOOM_LVL_BASE       ) : 0);
-	int clip_top    = (sub != NULL ? max(0,                   -sprite->y_offs + sub->top  * ZOOM_LVL_BASE       ) : 0);
-	int clip_right  = (sub != NULL ? max(0, sprite->width  - (-sprite->x_offs + (sub->right + 1)  * ZOOM_LVL_BASE)) : 0);
-	int clip_bottom = (sub != NULL ? max(0, sprite->height - (-sprite->y_offs + (sub->bottom + 1) * ZOOM_LVL_BASE)) : 0);
+	int clip_left   = (sub != NULL ? ::max(0,                   -sprite->x_offs + sub->left * ZOOM_LVL_BASE       ) : 0);
+	int clip_top    = (sub != NULL ? ::max(0,                   -sprite->y_offs + sub->top  * ZOOM_LVL_BASE       ) : 0);
+	int clip_right  = (sub != NULL ? ::max(0, sprite->width  - (-sprite->x_offs + (sub->right + 1)  * ZOOM_LVL_BASE)) : 0);
+	int clip_bottom = (sub != NULL ? ::max(0, sprite->height - (-sprite->y_offs + (sub->bottom + 1) * ZOOM_LVL_BASE)) : 0);
 
 	if (clip_left + clip_right >= sprite->width) return;
 	if (clip_top + clip_bottom >= sprite->height) return;
@@ -1398,10 +1398,10 @@ static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode,
 	Blitter::BlitterParams bp;
 
 	/* Amount of pixels to clip from the source sprite */
-	int clip_left   = (sub != NULL ? max(0,                   -sprite->x_offs + sub->left       ) : 0);
-	int clip_top    = (sub != NULL ? max(0,                   -sprite->y_offs + sub->top        ) : 0);
-	int clip_right  = (sub != NULL ? max(0, sprite->width  - (-sprite->x_offs + sub->right  + 1)) : 0);
-	int clip_bottom = (sub != NULL ? max(0, sprite->height - (-sprite->y_offs + sub->bottom + 1)) : 0);
+	int clip_left   = (sub != NULL ? ::max(0,                   -sprite->x_offs + sub->left       ) : 0);
+	int clip_top    = (sub != NULL ? ::max(0,                   -sprite->y_offs + sub->top        ) : 0);
+	int clip_right  = (sub != NULL ? ::max(0, sprite->width  - (-sprite->x_offs + sub->right  + 1)) : 0);
+	int clip_bottom = (sub != NULL ? ::max(0, sprite->height - (-sprite->y_offs + sub->bottom + 1)) : 0);
 
 	if (clip_left + clip_right >= sprite->width) return;
 	if (clip_top + clip_bottom >= sprite->height) return;
@@ -1643,7 +1643,7 @@ void LoadStringWidthTable(bool monospace)
 		_max_char_size[fs].height = GetCharacterHeight(fs);
 		for (uint i = 0; i != 224; i++) {
 			_stringwidth_table[fs][i] = GetGlyphWidth(fs, i + 32);
-			_max_char_size[fs].width = max<int>(_max_char_size[fs].width, _stringwidth_table[fs][i]);
+			_max_char_size[fs].width = ::max<int>(_max_char_size[fs].width, _stringwidth_table[fs][i]);
 		}
 
 		/* Needed because they need to be 1 more than the widest. */
@@ -1654,8 +1654,8 @@ void LoadStringWidthTable(bool monospace)
 	_max_char_width  = 0;
 	_max_char_height = 0;
 	for (FontSize fs = FS_BEGIN; fs < FS_END; fs++) {
-		_max_char_width = max<int>(_max_char_width, _max_char_size[fs].width);
-		_max_char_height = max<int>(_max_char_height, _max_char_size[fs].height);
+		_max_char_width = ::max<int>(_max_char_width, _max_char_size[fs].width);
+		_max_char_height = ::max<int>(_max_char_height, _max_char_size[fs].height);
 	}
 
 	ReInitAllWindows();
@@ -1684,7 +1684,7 @@ byte GetDigitWidth(FontSize size)
 {
 	byte width = 0;
 	for (char c = '0'; c <= '9'; c++) {
-		width = max(GetCharacterWidth(size, c), width);
+		width = ::max(GetCharacterWidth(size, c), width);
 	}
 	return width;
 }
@@ -1718,8 +1718,9 @@ void UndrawMouseCursor()
 
 void DrawMouseCursor()
 {
-#if defined(WINCE)
+#if defined(WINCE) || defined(__QNXNTO__)
 	/* Don't ever draw the mouse for WinCE, as we work with a stylus */
+	// JEREMY: FIXME: When using an actual mouse, we need to draw the cursor. When using touch devices, we don't! Help!
 	return;
 #endif
 

@@ -97,14 +97,14 @@ public:
 		uint tile_y = (TileY(tile) / N) * N;
 		uint w = N, h = N;
 
-		w += min(extend * N, tile_x);
-		h += min(extend * N, tile_y);
+		w += ::min(extend * N, tile_x);
+		h += ::min(extend * N, tile_y);
 
-		tile_x -= min(extend * N, tile_x);
-		tile_y -= min(extend * N, tile_y);
+		tile_x -= ::min(extend * N, tile_x);
+		tile_y -= ::min(extend * N, tile_y);
 
-		w += min(extend * N, MapSizeX() - tile_x - w);
-		h += min(extend * N, MapSizeY() - tile_y - h);
+		w += ::min(extend * N, MapSizeX() - tile_x - w);
+		h += ::min(extend * N, MapSizeY() - tile_y - h);
 
 		return TileArea(TileXY(tile_x, tile_y), w, h);
 	}

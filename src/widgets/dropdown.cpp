@@ -358,7 +358,7 @@ void ShowDropDownListAt(Window *w, DropDownList *list, int selected, int button,
 		/* Find the longest item in the list */
 		for (DropDownList::const_iterator it = list->begin(); it != list->end(); ++it) {
 			const DropDownListItem *item = *it;
-			max_item_width = max(max_item_width, item->Width() + 5);
+			max_item_width = ::max(max_item_width, item->Width() + 5);
 		}
 	}
 
@@ -375,19 +375,28 @@ void ShowDropDownListAt(Window *w, DropDownList *list, int selected, int button,
 
 	/* Check if the status bar is visible, as we don't want to draw over it */
 	int screen_bottom = GetMainViewBottom();
+	int screen_top = GetMainViewTop();
 	bool scroll = false;
 
 	/* Check if the dropdown will fully fit below the widget */
 	if (top + height + 4 >= screen_bottom) {
 		/* If not, check if it will fit above the widget */
-		if (w->top + wi_rect.top - height > GetMainViewTop()) {
+		if (w->top + wi_rect.top - height > screen_top) {
 			top = w->top + wi_rect.top - height - 4;
 		} else {
 			/* ... and lastly if it won't, enable the scroll bar and fit the
-			 * list in below the widget */
+			 * list in either above or below the widget, whichever has more space */
 			int avg_height = list_height / (int)list->size();
-			int rows = (screen_bottom - 4 - top) / avg_height;
+			int rowsBelow = (screen_bottom - 4 - top) / avg_height;
+			int rowsAbove = (w->top + wi_rect.top - screen_top) / avg_height;
+			int rows = rowsBelow;
+			if (rowsAbove > rowsBelow) {
+				rows = rowsAbove;
+			}
 			height = rows * avg_height;
+			if (rows == rowsAbove) {
+				top = w->top + wi_rect.top - height - 4;
+			}
 			scroll = true;
 			/* Add space for the scroll bar if we automatically determined
 			 * the width of the list. */
@@ -395,7 +404,7 @@ void ShowDropDownListAt(Window *w, DropDownList *list, int selected, int button,
 		}
 	}
 
-	if (auto_width) width = max(width, max_item_width);
+	if (auto_width) width = ::max(width, max_item_width);
 
 	Point dw_pos = { w->left + (_current_text_dir == TD_RTL ? wi_rect.right + 1 - width : wi_rect.left), top};
 	Dimension dw_size = {width, height};

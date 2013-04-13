@@ -110,9 +110,9 @@ static uint NPFDistanceTrack(TileIndex t0, TileIndex t1)
 	const uint dx = Delta(TileX(t0), TileX(t1));
 	const uint dy = Delta(TileY(t0), TileY(t1));
 
-	const uint straightTracks = 2 * min(dx, dy); // The number of straight (not full length) tracks
+	const uint straightTracks = 2 * ::min(dx, dy); // The number of straight (not full length) tracks
 	/* OPTIMISATION:
-	 * Original: diagTracks = max(dx, dy) - min(dx,dy);
+	 * Original: diagTracks = ::max(dx, dy) - ::min(dx,dy);
 	 * Proof:
 	 * (dx+dy) - straightTracks  == (min + max) - straightTracks = min + max - 2 * min = max - min */
 	const uint diagTracks = dx + dy - straightTracks; // The number of diagonal (full tile length) tracks.

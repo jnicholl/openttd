@@ -280,7 +280,7 @@
 	FOR_ALL_STATIONS(st) {
 		if (st->town == t && (st->facilities & FACIL_AIRPORT) && st->airport.type != AT_OILRIG) num++;
 	}
-	return max(0, 2 - num);
+	return ::max(0, 2 - num);
 }
 
 /* static */ ScriptTown::RoadLayout ScriptTown::GetRoadLayout(TownID town_id)

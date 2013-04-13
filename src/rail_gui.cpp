@@ -946,7 +946,7 @@ public:
 		}
 		if (newstation) {
 			_railstation.station_count = StationClass::Get(_railstation.station_class)->GetSpecCount();
-			_railstation.station_type = min(_railstation.station_type, _railstation.station_count - 1);
+			_railstation.station_type = ::min(_railstation.station_type, _railstation.station_count - 1);
 
 			int count = 0;
 			for (uint i = 0; i < StationClass::GetClassCount(); i++) {
@@ -956,7 +956,7 @@ public:
 			this->vscroll = this->GetScrollbar(WID_BRAS_NEWST_SCROLL);
 			this->vscroll->SetCount(count);
 			this->vscroll->SetCapacity(GB(this->GetWidget<NWidgetCore>(WID_BRAS_NEWST_LIST)->widget_data, MAT_ROW_START, MAT_ROW_BITS));
-			this->vscroll->SetPosition(Clamp(_railstation.station_class - 2, 0, max(this->vscroll->GetCount() - this->vscroll->GetCapacity(), 0)));
+			this->vscroll->SetPosition(Clamp(_railstation.station_class - 2, 0, ::max(this->vscroll->GetCount() - this->vscroll->GetCapacity(), 0)));
 
 			this->vscroll2 = this->GetScrollbar(WID_BRAS_MATRIX_SCROLL);
 			NWidgetMatrix *matrix = this->GetWidget<NWidgetMatrix>(WID_BRAS_MATRIX);
@@ -1029,7 +1029,7 @@ public:
 					SetDParam(0, StationClass::Get((StationClassID)i)->name);
 					d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
 				}
-				size->width = max(size->width, d.width + padding.width);
+				size->width = ::max(size->width, d.width + padding.width);
 				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
 				size->height = GB(this->GetWidget<NWidgetCore>(widget)->widget_data, MAT_ROW_START, MAT_ROW_BITS) * this->line_height;
 				resize->height = this->line_height;
@@ -1055,7 +1055,7 @@ public:
 						d = maxdim(d, GetStringBoundingBox(str));
 					}
 				}
-				size->width = max(size->width, d.width + padding.width);
+				size->width = ::max(size->width, d.width + padding.width);
 				break;
 			}
 
@@ -1291,7 +1291,7 @@ public:
 							_railstation.station_class = (StationClassID)i;
 							StationClass *stclass = StationClass::Get(_railstation.station_class);
 							_railstation.station_count = stclass->GetSpecCount();
-							_railstation.station_type  = min((int)_railstation.station_type, max(0, (int)_railstation.station_count - 1));
+							_railstation.station_type  = ::min((int)_railstation.station_type, ::max(0, (int)_railstation.station_count - 1));
 
 							this->CheckSelectedSize(stclass->GetSpec(_railstation.station_type));
 

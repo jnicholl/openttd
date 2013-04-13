@@ -57,7 +57,7 @@ static void OS2_SwitchToConsoleMode()
 }
 #endif
 
-#if defined(UNIX) || defined(PSP)
+#if defined(UNIX) || defined(PSP) || defined(__QNXNTO__)
 #	include <sys/time.h> /* gettimeofday */
 #	include <sys/types.h>
 #	include <unistd.h>
@@ -188,7 +188,7 @@ void VideoDriver_Dedicated::MakeDirty(int left, int top, int width, int height) 
 bool VideoDriver_Dedicated::ChangeResolution(int w, int h) { return false; }
 bool VideoDriver_Dedicated::ToggleFullscreen(bool fs) { return false; }
 
-#if defined(UNIX) || defined(__OS2__) || defined(PSP)
+#if defined(UNIX) || defined(__OS2__) || defined(PSP) || defined(__QNXNTO__)
 static bool InputWaiting()
 {
 	struct timeval tv;
@@ -234,7 +234,7 @@ static void DedicatedHandleKeyInput()
 
 	if (_exit_game) return;
 
-#if defined(UNIX) || defined(__OS2__) || defined(PSP)
+#if defined(UNIX) || defined(__OS2__) || defined(PSP) || defined(__QNXNTO__)
 	if (fgets(input_line, lengthof(input_line), stdin) == NULL) return;
 #else
 	/* Handle console input, and signal console thread, it can accept input again */
@@ -263,7 +263,7 @@ void VideoDriver_Dedicated::MainLoop()
 	uint32 next_tick = cur_ticks + MILLISECONDS_PER_TICK;
 
 	/* Signal handlers */
-#if defined(UNIX) || defined(PSP)
+#if defined(UNIX) || defined(PSP) || defined(__QNXNTO__)
 	signal(SIGTERM, DedicatedSignalHandler);
 	signal(SIGINT, DedicatedSignalHandler);
 	signal(SIGQUIT, DedicatedSignalHandler);

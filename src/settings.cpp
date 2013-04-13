@@ -1585,6 +1585,20 @@ void LoadFromConfig(bool minimal)
 	if (!minimal) {
 		_grfconfig_newgame = GRFLoadConfig(ini, "newgrf", false);
 		_grfconfig_static  = GRFLoadConfig(ini, "newgrf-static", true);
+#ifdef __QNXNTO__
+		// JEREMY: Hack to enable biggui at the start.
+		if (_grfconfig_static == NULL) {
+			fprintf(stderr, "JEREMY: No static GRF\n");
+			const char *groupName = "newgrf-static";
+			IniFile dummy(&groupName);
+			IniGroup *group = new IniGroup(&dummy, groupName, 0);
+			IniItem *item = new IniItem(group, "opengfx_biggui-2.0.0" PATHSEP "ogfx-biggui.grf", 0);
+			item->SetValue("2");
+			fprintf(stderr, "JEREMY: Trying to force load big gui\n");
+			_grfconfig_static = GRFLoadConfig(&dummy, groupName, true);
+			fprintf(stderr, "JEREMY: Finished trying to force load big gui: %p\n", _grfconfig_static);
+		}
+#endif
 		AILoadConfig(ini, "ai_players");
 		GameLoadConfig(ini, "game_scripts");
 

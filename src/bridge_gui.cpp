@@ -203,7 +203,7 @@ public:
 				}
 				sprite_dim.height++; // Sprite is rendered one pixel down in the matrix field.
 				text_dim.height++; // Allowing the bottom row pixels to be rendered on the edge of the matrix field.
-				resize->height = max(sprite_dim.height, text_dim.height) + 2; // Max of both sizes + account for matrix edges.
+				resize->height = ::max(sprite_dim.height, text_dim.height) + 2; // Max of both sizes + account for matrix edges.
 
 				this->bridgetext_offset = WD_MATRIX_LEFT + sprite_dim.width + 1; // Left edge of text, 1 pixel distance from the sprite.
 				size->width = this->bridgetext_offset + text_dim.width + WD_MATRIX_RIGHT;
@@ -299,7 +299,7 @@ public:
 		this->vscroll->SetCapacityFromWidget(this, WID_BBS_BRIDGE_LIST);
 		this->GetWidget<NWidgetCore>(WID_BBS_BRIDGE_LIST)->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
-		this->last_size = max(this->vscroll->GetCapacity(), this->last_size);
+		this->last_size = ::max(this->vscroll->GetCapacity(), this->last_size);
 	}
 };
 

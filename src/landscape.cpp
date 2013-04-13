@@ -546,8 +546,8 @@ void SetSnowLine(byte table[SNOW_LINE_MONTHS][SNOW_LINE_DAYS])
 
 	for (uint i = 0; i < SNOW_LINE_MONTHS; i++) {
 		for (uint j = 0; j < SNOW_LINE_DAYS; j++) {
-			_snow_line->highest_value = max(_snow_line->highest_value, table[i][j]);
-			_snow_line->lowest_value = min(_snow_line->lowest_value, table[i][j]);
+			_snow_line->highest_value = ::max(_snow_line->highest_value, table[i][j]);
+			_snow_line->lowest_value = ::min(_snow_line->lowest_value, table[i][j]);
 		}
 	}
 }
