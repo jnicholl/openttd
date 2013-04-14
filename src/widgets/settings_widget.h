@@ -12,6 +12,10 @@
 #ifndef WIDGETS_SETTINGS_WIDGET_H
 #define WIDGETS_SETTINGS_WIDGET_H
 
+#if defined(__QNXNTO__)
+#define USE_SIMPLE_SETTINGS_GUI
+#endif
+
 /** Widgets of the #GameOptionsWindow class. */
 enum GameOptionsWidgets {
 	WID_GO_BACKGROUND,             ///< Background of the window.
@@ -35,6 +39,15 @@ enum GameOptionsWidgets {
 	WID_GO_BASE_MUSIC_STATUS,      ///< Info about corrupted files etc.
 	WID_GO_BASE_MUSIC_TEXTFILE,    ///< Open base music readme, changelog (+1) or license (+2).
 	WID_GO_BASE_MUSIC_DESCRIPTION = WID_GO_BASE_MUSIC_TEXTFILE + TFT_END, ///< Description of selected base music set.
+#ifdef USE_SIMPLE_SETTINGS_GUI
+	WID_GO_OPTIONS1_SEL,
+	WID_GO_OPTIONS2_SEL,
+	WID_GO_BASE_GRF_SEL,
+	WID_GO_BASE_SFX_SEL,
+	WID_GO_BASE_MUSIC_SEL,
+	WID_GO_PREVIOUS_VIEW_BUTTON,
+	WID_GO_NEXT_VIEW_BUTTON,
+#endif
 };
 
 /** Widgets of the #GameSettingsWindow class. */
