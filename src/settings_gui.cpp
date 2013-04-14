@@ -158,15 +158,19 @@ void ShowBaseSetTextfileWindow(TextfileType file_type, const TBaseSet* baseset, 
 struct GameOptionsWindow : Window {
 	GameSettings *opt;
 	bool reload;
-	int state; // 0 is options, 1 is baseset
+#if defined(USE_SIMPLE_SETTINGS_GUI)
+	int state;
 	int maxState;
+#endif
 
 	GameOptionsWindow(const WindowDesc *desc) : Window()
 	{
 		this->opt = &GetGameSettings();
 		this->reload = false;
+#if defined(USE_SIMPLE_SETTINGS_GUI)
 		this->state = 0;
 		this->maxState = 4;
+#endif
 
 		this->InitNested(desc, WN_GAME_OPTIONS_GAME_OPTIONS);
 		this->OnInvalidateData(0);
@@ -199,12 +203,10 @@ struct GameOptionsWindow : Window {
 		}
 
 		if (needReInit) {
-			fprintf(stderr, "Before reinit: Window at %d,%d,%d,%d\n", left, top, width, height);
-			fprintf(stderr, "Screen size: %d,%d,%d,%d\n", _screen.left, _screen.top, _screen.width, _screen.height);
 			this->ReInit();
-			fprintf(stderr, "After reinit: Window at %d,%d,%d,%d\n", left, top, width, height);
-			fprintf(stderr, "Screen size: %d,%d,%d,%d\n", _screen.left, _screen.top, _screen.width, _screen.height);
+			// Re-center the window - FIXME: Should we only re-center it if it was centered?
 			if (width < _screen.width && height < _screen.height) {
+				this->SetDirty();
 				left = (_screen.width - width) >> 1;
 				top = (_screen.height - height) >> 1;
 				this->SetDirty();

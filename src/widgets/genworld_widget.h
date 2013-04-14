@@ -12,6 +12,10 @@
 #ifndef WIDGETS_GENWORLD_WIDGET_H
 #define WIDGETS_GENWORLD_WIDGET_H
 
+#if defined(__QNXNTO__)
+#define USE_SIMPLE_GENWORLD_GUI
+#endif
+
 /** Widgets of the #GenerateLandscapeWindow class. */
 enum GenerateLandscapeWidgets {
 	WID_GL_TEMPERATE,                   ///< Button with icon "Temperate".
@@ -56,6 +60,15 @@ enum GenerateLandscapeWidgets {
 	WID_GL_WATER_NE,                    ///< NE 'Water'/'Freeform'.
 	WID_GL_WATER_SE,                    ///< SE 'Water'/'Freeform'.
 	WID_GL_WATER_SW,                    ///< SW 'Water'/'Freeform'.
+
+#if defined(USE_SIMPLE_GENWORLD_GUI)
+	WID_GL_PREVIOUS_VIEW_BUTTON,
+	WID_GL_NEXT_VIEW_BUTTON,
+
+	WID_GL_BASIC_SEL,
+	WID_GL_TERRAIN1_SEL,
+	WID_GL_TERRAIN2_SEL,
+#endif
 };
 
 /** Widgets of the #CreateScenarioWindow class. */
