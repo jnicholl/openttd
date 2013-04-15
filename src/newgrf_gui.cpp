@@ -1997,7 +1997,6 @@ struct ScanProgressWindow : public Window {
 				/* We need some spacing for the 'border' */
 				size->height += 8;
 				size->width += 8;
-				fprintf(stderr, "progress bar size: %dx%d\n", size->width, size->height);
 				break;
 			}
 
@@ -2012,7 +2011,6 @@ struct ScanProgressWindow : public Window {
 				size->width = ::max(400U, GetStringBoundingBox(STR_NEWGRF_SCAN_STATUS).width);
 #endif
 				size->height = FONT_HEIGHT_NORMAL * 2 + WD_PAR_VSEP_NORMAL;
-				fprintf(stderr, "text size: %dx%d\n", size->width, size->height);
 				break;
 		}
 	}
