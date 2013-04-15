@@ -226,6 +226,7 @@ static const NWidgetPart _nested_save_dialog_widgets[] = {
 						EndContainer(),
 						NWidget(WWT_EDITBOX, COLOUR_GREY, WID_SL_SAVE_OSK_TITLE), SetPadding(3, 2, 2, 2), SetFill(1, 0), SetResize(1, 0),
 								SetDataTip(STR_SAVELOAD_OSKTITLE, STR_SAVELOAD_EDITBOX_TOOLTIP),
+						NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SAVE_GAME), SetDataTip(STR_SAVELOAD_SAVE_BUTTON, STR_SAVELOAD_SAVE_TOOLTIP), SetFill(1, 0), SetResize(1, 0),
 					EndContainer(),
 				EndContainer(),
 			EndContainer(),
@@ -809,7 +810,13 @@ public:
 			} else {
 				this->InvalidateData();
 				/* Reset file name to current date on successful delete */
-				if (_saveload_mode == SLD_SAVE_GAME) GenerateFileName();
+				if (_saveload_mode == SLD_SAVE_GAME) {
+					GenerateFileName();
+#if defined(USE_SIMPLE_FIOS_GUI)
+					this->state = 0;
+					this->SetDirty();
+#endif
+				}
 			}
 		} else if (this->IsWidgetLowered(WID_SL_SAVE_GAME)) { // Save button clicked
 			if (_saveload_mode  == SLD_SAVE_GAME || _saveload_mode == SLD_SAVE_SCENARIO) {
