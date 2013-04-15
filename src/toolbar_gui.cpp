@@ -58,8 +58,9 @@ static ScreenshotType _confirmed_screenshot_type; ///< Screenshot type the curre
 /** Toobar modes */
 enum ToolbarMode {
 	TB_NORMAL,
-	TB_UPPER,
-	TB_LOWER
+	TB_PAGE1,
+	TB_PAGE2,
+	TB_PAGE3
 };
 
 /** Callback functions. */
@@ -1053,14 +1054,16 @@ static CallBackFunction MenuClickHelp(int index)
 
 static CallBackFunction ToolbarSwitchClick(Window *w)
 {
-	if (_toolbar_mode != TB_LOWER) {
-		_toolbar_mode = TB_LOWER;
+	if (_toolbar_mode == TB_PAGE1) {
+		_toolbar_mode = TB_PAGE2;
+	} else if (_toolbar_mode == TB_PAGE2) {
+		_toolbar_mode = TB_PAGE3;
 	} else {
-		_toolbar_mode = TB_UPPER;
+		_toolbar_mode = TB_PAGE1;
 	}
 
 	w->ReInit();
-	w->SetWidgetLoweredState(WID_TN_SWITCH_BAR, _toolbar_mode == TB_LOWER);
+	//w->SetWidgetLoweredState(WID_TN_SWITCH_BAR, _toolbar_mode == TB_PAGE2);
 	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
@@ -1363,8 +1366,26 @@ public:
 class NWidgetMainToolbarContainer : public NWidgetToolbarContainer {
 	/* virtual */ const byte *GetButtonArrangement(uint &width, uint &arrangable_count, uint &button_count, uint &spacer_count) const
 	{
-		static const uint SMALLEST_ARRANGEMENT = 14;
+		static const uint SMALLEST_ARRANGEMENT = 11;
 		static const uint BIGGEST_ARRANGEMENT  = 19;
+		static const byte arrange11[] = {
+			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
+			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
+			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+		};
+
+		static const byte arrange12[] = {
+			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
+			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
+			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+		};
+
+		static const byte arrange13[] = {
+			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
+			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
+			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+		};
+
 		static const byte arrange14[] = {
 			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27,
 			2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 24, 25, 26, 27,
@@ -1402,11 +1423,19 @@ class NWidgetMainToolbarContainer : public NWidgetToolbarContainer {
 		}
 
 		/* Introduce the split toolbar */
-		static const byte * const arrangements[] = { arrange14, arrange15, arrange16, arrange17, arrange18, arrange19 };
+		static const byte * const arrangements[] = {arrange11, arrange14, arrange15, arrange16, arrange17, arrange18, arrange19 };
 
 		button_count = arrangable_count = full_buttons;
 		spacer_count = this->spacers;
-		return arrangements[full_buttons - SMALLEST_ARRANGEMENT] + ((_toolbar_mode == TB_LOWER) ? full_buttons : 0);
+		if (full_buttons != SMALLEST_ARRANGEMENT) {
+			return arrangements[full_buttons - SMALLEST_ARRANGEMENT] + ((_toolbar_mode == TB_PAGE2) ? full_buttons : 0);
+		} else if (_toolbar_mode == TB_NORMAL || _toolbar_mode == TB_PAGE3){
+			return arrangements[0];
+		} else if (_toolbar_mode == TB_PAGE1) {
+			return arrangements[0] + full_buttons;
+		} else {
+			return arrangements[0] + (full_buttons*2);
+		}
 	}
 };
 
@@ -1467,7 +1496,7 @@ class NWidgetScenarioToolbarContainer : public NWidgetToolbarContainer {
 		arrangable_count = lengthof(arrange_switch) / 2;
 		button_count = arrangable_count - 1;
 		spacer_count = 0;
-		return arrange_switch + ((_toolbar_mode == TB_LOWER) ? arrangable_count : 0);
+		return arrange_switch + ((_toolbar_mode == TB_PAGE2) ? arrangable_count : 0);
 	}
 };
 

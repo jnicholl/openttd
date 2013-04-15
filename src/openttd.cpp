@@ -856,11 +856,9 @@ int ttd_main(int argc, char *argv[])
 	}
 
 exit:
-	printf ("MING: Going to shutdown the game\n");
 	/* Reset windowing system, stop drivers, free used memory, ... */
 	ShutdownGame();
 
-	printf ("MING: Finished shutdown, freeing memory\n");
 	free(BaseGraphics::ini_set);
 	free(BaseSounds::ini_set);
 	free(BaseMusic::ini_set);
@@ -869,7 +867,6 @@ exit:
 	free(_ini_videodriver);
 	free(_ini_blitter);
 
-	printf ("MING: Freed memory, closing\n");
 	return 0;
 }
 
