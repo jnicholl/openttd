@@ -70,7 +70,6 @@
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="Device-Release/openttd" entry="true" type="Qnx/Elf">openttd</asset>
        <asset path="${workspace_loc:/SDL12/Device-Release/libSDL12.so}" type="Qnx/Elf">lib/libSDL12.so</asset>
-       <asset path="${workspace_loc:/timidity/Device-Release/libtimidity.so}" type="Qnx/Elf">lib/libtimidity.so</asset>
     </configuration>
     <configuration name="Device-Profile">
        <platformArchitecture>armle-v7</platformArchitecture>
