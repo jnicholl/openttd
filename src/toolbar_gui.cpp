@@ -1369,23 +1369,20 @@ class NWidgetMainToolbarContainer : public NWidgetToolbarContainer {
 		static const uint SMALLEST_ARRANGEMENT = 11;
 		static const uint BIGGEST_ARRANGEMENT  = 19;
 		static const byte arrange11[] = {
-			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
-			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
-			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+			0,  1, 10, 11, 12, 13, 14, 15, 16, 17, 27,
+			0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 27,
+			0, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
 		};
-
 		static const byte arrange12[] = {
-			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
-			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
-			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+			0,  1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 27,
+			0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 18, 27,
+			0,  1, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
 		};
-
 		static const byte arrange13[] = {
-			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 27,
-			0,  1,  4,  5,  6,  7,  8,  9, 10, 11, 27,
-			0,  1,  2,  3,  21,  22, 23, 24, 25, 26, 27,
+			0,  1, 10, 11,  4, 12, 13, 14, 15, 16, 17, 18, 27,
+			0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 17, 18, 27,
+			0,  1, 19, 20, 21, 22, 23, 24, 25, 26, 17, 18, 27,
 		};
-
 		static const byte arrange14[] = {
 			0,  1, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 27,
 			2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 24, 25, 26, 27,
@@ -1423,12 +1420,12 @@ class NWidgetMainToolbarContainer : public NWidgetToolbarContainer {
 		}
 
 		/* Introduce the split toolbar */
-		static const byte * const arrangements[] = {arrange11, arrange14, arrange15, arrange16, arrange17, arrange18, arrange19 };
+		static const byte * const arrangements[] = {arrange11, arrange12, arrange13, arrange14, arrange15, arrange16, arrange17, arrange18, arrange19 };
 
 		button_count = arrangable_count = full_buttons;
 		spacer_count = this->spacers;
 		if (full_buttons != SMALLEST_ARRANGEMENT) {
-			return arrangements[full_buttons - SMALLEST_ARRANGEMENT] + ((_toolbar_mode == TB_PAGE2) ? full_buttons : 0);
+			return arrangements[full_buttons - SMALLEST_ARRANGEMENT] + ((_toolbar_mode >= TB_PAGE2) ? full_buttons : 0);
 		} else if (_toolbar_mode == TB_NORMAL || _toolbar_mode == TB_PAGE3){
 			return arrangements[0];
 		} else if (_toolbar_mode == TB_PAGE1) {
