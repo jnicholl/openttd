@@ -1934,18 +1934,34 @@ void ShowNewGRFSettings(bool editable, bool show_params, bool exec_changes, GRFC
 }
 
 /** Widgets for the progress window. */
+#if defined(__QNXNTO__)
 static const NWidgetPart _nested_scan_progress_widgets[] = {
 	NWidget(WWT_CAPTION, COLOUR_GREY), SetDataTip(STR_NEWGRF_SCAN_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 	NWidget(WWT_PANEL, COLOUR_GREY),
-		NWidget(NWID_HORIZONTAL), SetPIP(20, 0, 20),
+		NWidget(NWID_HORIZONTAL), SetPIP(8, 0, 8),
 			NWidget(NWID_VERTICAL), SetPIP(11, 8, 11),
-				NWidget(WWT_LABEL, INVALID_COLOUR), SetDataTip(STR_NEWGRF_SCAN_MESSAGE, STR_NULL), SetFill(1, 0),
 				NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SP_PROGRESS_BAR), SetFill(1, 0),
 				NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SP_PROGRESS_TEXT), SetFill(1, 0),
 			EndContainer(),
 		EndContainer(),
 	EndContainer(),
 };
+#else
+static const NWidgetPart _nested_scan_progress_widgets[] = {
+	NWidget(WWT_CAPTION, COLOUR_GREY), SetDataTip(STR_NEWGRF_SCAN_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
+	NWidget(WWT_PANEL, COLOUR_GREY),
+		NWidget(NWID_HORIZONTAL), SetPIP(20, 0, 20),
+			NWidget(NWID_VERTICAL), SetPIP(11, 8, 11),
+#if !defined(__QNXNTO__)
+				NWidget(WWT_LABEL, INVALID_COLOUR), SetDataTip(STR_NEWGRF_SCAN_MESSAGE, STR_NULL), SetFill(1, 0),
+#endif
+				NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SP_PROGRESS_BAR), SetFill(1, 0),
+				NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SP_PROGRESS_TEXT), SetFill(1, 0),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+};
+#endif
 
 /** Description of the widgets and other settings of the window. */
 static const WindowDesc _scan_progress_desc(
@@ -1981,6 +1997,7 @@ struct ScanProgressWindow : public Window {
 				/* We need some spacing for the 'border' */
 				size->height += 8;
 				size->width += 8;
+				fprintf(stderr, "progress bar size: %dx%d\n", size->width, size->height);
 				break;
 			}
 
@@ -1989,8 +2006,13 @@ struct ScanProgressWindow : public Window {
 				SetDParamMaxDigits(1, 4);
 				/* We really don't know the width. We could determine it by scanning the NewGRFs,
 				 * but this is the status window for scanning them... */
+#if defined(__QNXNTO__)
+				size->width = 350U;
+#else
 				size->width = ::max(400U, GetStringBoundingBox(STR_NEWGRF_SCAN_STATUS).width);
+#endif
 				size->height = FONT_HEIGHT_NORMAL * 2 + WD_PAR_VSEP_NORMAL;
+				fprintf(stderr, "text size: %dx%d\n", size->width, size->height);
 				break;
 		}
 	}
@@ -2011,9 +2033,13 @@ struct ScanProgressWindow : public Window {
 			case WID_SP_PROGRESS_TEXT:
 				SetDParam(0, this->scanned);
 				SetDParam(1, _settings_client.gui.last_newgrf_count);
+#if defined(__QNXNTO__)
+				DrawString(r.left, r.right, r.top, this->last_name == NULL ? "" : this->last_name, TC_BLACK, SA_HOR_CENTER);
+#else
 				DrawString(r.left, r.right, r.top, STR_NEWGRF_SCAN_STATUS, TC_FROMSTRING, SA_HOR_CENTER);
 
 				DrawString(r.left, r.right, r.top + FONT_HEIGHT_NORMAL + WD_PAR_VSEP_NORMAL, this->last_name == NULL ? "" : this->last_name, TC_BLACK, SA_HOR_CENTER);
+#endif
 				break;
 		}
 	}
