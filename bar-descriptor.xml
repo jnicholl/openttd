@@ -105,6 +105,7 @@
     
     <!-- Ensure that shared libraries in the package are found at run-time. -->
     <env var="LD_LIBRARY_PATH" value="app/native/lib"/>
+    <env var="SCREEN_IDLE_NORMAL" value="1"/>
     <env var="CONSOLE_MODE" value="file"/>
     <arg>-b32bpp-anim</arg>
     
