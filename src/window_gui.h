@@ -22,6 +22,7 @@
 
 #ifdef __QNXNTO__
 #define USE_SIMPLE_WINDOW_GUI
+#define USE_TOUCH_SCROLLING
 #endif
 
 /** State of handling an event. */
@@ -314,6 +315,9 @@ public:
 	Dimension unshaded_size;         ///< Last known unshaded size (only valid while shaded).
 
 	int scrolling_scrollbar;         ///< Widgetindex of just being dragged scrollbar. -1 if none is active.
+#if defined(USE_TOUCH_SCROLLING)
+	bool touch_scroll;               ///< Used for touch scrolling to reverse scroll direction
+#endif
 
 	Window *parent;                  ///< Parent window.
 	Window *z_front;                 ///< The window in front of us in z-order.
@@ -878,5 +882,9 @@ extern SpecialMouseMode _special_mouse_mode;
 void SetFocusedWindow(Window *w);
 
 void ScrollbarClickHandler(Window *w, NWidgetCore *nw, int x, int y);
+
+#if defined(USE_TOUCH_SCROLLING)
+void TouchScrollHandler(Window *w, NWidgetCore *nw, int x, int y);
+#endif
 
 #endif /* WINDOW_GUI_H */

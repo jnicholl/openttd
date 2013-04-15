@@ -70,6 +70,42 @@ static Point HandleScrollbarHittest(const Scrollbar *sb, int top, int bottom, bo
 	return pt;
 }
 
+#if defined(USE_TOUCH_SCROLLING)
+/**
+ * Compute new position of the scrollbar after a touch scroll and updates the window flags.
+ * @param w   Window on which a scroll was performed.
+ * @param sb  Scrollbar
+ * @param mi  Minimum coordinate of the scroll bar.
+ * @param ma  Maximum coordinate of the scroll bar.
+ * @param x   The X coordinate of the mouse click.
+ * @param y   The Y coordinate of the mouse click.
+ */
+static void TouchScrollPositioning(Window *w, NWidgetScrollbar *sb, int x, int y, int mi, int ma)
+{
+	int pos;
+	int button_size;
+	bool rtl = false;
+
+	if (sb->type == NWID_HSCROLLBAR) {
+		pos = x;
+		rtl = _current_text_dir == TD_RTL;
+		button_size = NWidgetScrollbar::GetHorizontalDimension().width;
+	} else {
+		pos = y;
+		button_size = NWidgetScrollbar::GetVerticalDimension().height;
+	}
+
+	Point pt = HandleScrollbarHittest(sb, mi, ma, sb->type == NWID_HSCROLLBAR);
+	_scrollbar_start_pos = pt.x - mi - button_size;
+	_scrollbar_size = ma - mi - button_size * 2;
+	w->scrolling_scrollbar = sb->index;
+	w->touch_scroll = true;
+	_cursorpos_drag_start = _cursor.pos;
+
+	w->SetDirty();
+}
+#endif
+
 /**
  * Compute new position of the scrollbar after a click and updates the window flags.
  * @param w   Window on which a scroll was performed.
@@ -149,6 +185,30 @@ void ScrollbarClickHandler(Window *w, NWidgetCore *nw, int x, int y)
 	}
 	ScrollbarClickPositioning(w, dynamic_cast<NWidgetScrollbar*>(nw), x, y, mi, ma);
 }
+
+#if defined(USE_TOUCH_SCROLLING)
+/**
+ * Special handling for the scrollbar widget type.
+ * Handles the special scrolling buttons and other scrolling.
+ * @param w Window on which a scroll was performed.
+ * @param nw Pointer to the scrollbar widget.
+ * @param x The X coordinate of the mouse click.
+ * @param y The Y coordinate of the mouse click.
+ */
+void TouchScrollHandler(Window *w, NWidgetCore *nw, int x, int y)
+{
+	int mi, ma;
+
+	if (nw->type == NWID_HSCROLLBAR) {
+		mi = nw->pos_x;
+		ma = nw->pos_x + nw->current_x;
+	} else {
+		mi = nw->pos_y;
+		ma = nw->pos_y + nw->current_y;
+	}
+	TouchScrollPositioning(w, dynamic_cast<NWidgetScrollbar*>(nw), x, y, mi, ma);
+}
+#endif
 
 /**
  * Returns the index for the widget located at the given position

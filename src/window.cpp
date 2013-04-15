@@ -511,7 +511,17 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 		Game::NewEvent(new ScriptEventWindowWidgetClick((ScriptWindow::WindowClass)w->window_class, w->window_number, widget_index));
 	}
 
-	w->OnClick(pt, widget_index, click_count);
+#if defined(USE_TOUCH_SCROLLING)
+	// Touch scrolling of widgets with attached scrollbars
+	// Side effect - double click events don't happen and you have to double click to get single click events.
+	if (nw->scrollbar_index != -1) {
+		if (click_count == 1)
+			TouchScrollHandler(w, w->GetWidget<NWidgetCore>(nw->scrollbar_index), x, y);
+		else
+			w->OnClick(pt, widget_index, click_count-1);
+	} else
+#endif
+		w->OnClick(pt, widget_index, click_count);
 }
 
 /**
@@ -1540,6 +1550,9 @@ void Window::InitNested(const WindowDesc *desc, WindowNumber window_number)
 
 /** Empty constructor, initialization has been moved to #InitNested() called from the constructor of the derived class. */
 Window::Window() : scrolling_scrollbar(-1)
+#if defined(USE_TOUCH_SCROLLING)
+	, touch_scroll(false)
+#endif
 {
 }
 
@@ -1626,6 +1639,9 @@ static void DecreaseWindowCounters()
 					if (sb->disp_flags & (ND_SCROLLBAR_UP | ND_SCROLLBAR_DOWN)) {
 						sb->disp_flags &= ~(ND_SCROLLBAR_UP | ND_SCROLLBAR_DOWN);
 						w->scrolling_scrollbar = -1;
+#if defined(USE_TOUCH_SCROLLING)
+						w->touch_scroll = false;
+#endif
 						sb->SetDirty(w);
 					}
 				}
@@ -2088,6 +2104,9 @@ static EventState HandleScrollbarScrolling()
 			/* Abort if no button is clicked any more. */
 			if (!_left_button_down) {
 				w->scrolling_scrollbar = -1;
+#if defined(USE_TOUCH_SCROLLING)
+				w->touch_scroll = false;
+#endif
 				w->SetDirty();
 				return ES_HANDLED;
 			}
@@ -2102,6 +2121,12 @@ static EventState HandleScrollbarScrolling()
 			} else {
 				i = _cursor.pos.y - _cursorpos_drag_start.y;
 			}
+
+#if defined(USE_TOUCH_SCROLLING)
+			if (w->touch_scroll) {
+				i = -i;
+			}
+#endif
 
 			if (sb->disp_flags & ND_SCROLLBAR_BTN) {
 				if (_scroller_click_timeout == 1) {
