@@ -29,6 +29,10 @@
 
 #include "table/strings.h"
 
+#if defined(USE_CONFIRM_COMMAND)
+#include "textbuf_gui.h"
+#endif
+
 CommandProc CmdBuildRailroadTrack;
 CommandProc CmdRemoveRailroadTrack;
 CommandProc CmdBuildSingleRail;
@@ -501,22 +505,7 @@ bool DoCommandP(const CommandContainer *container, bool my_cmd)
 	return DoCommandP(container->tile, container->p1, container->p2, container->cmd, container->callback, container->text, my_cmd);
 }
 
-/*!
- * Toplevel network safe docommand function for the current company. Must not be called recursively.
- * The callback is called when the command succeeded or failed. The parameters
- * \a tile, \a p1, and \a p2 are from the #CommandProc function. The parameter \a cmd is the command to execute.
- * The parameter \a my_cmd is used to indicate if the command is from a company or the server.
- *
- * @param tile The tile to perform a command on (see #CommandProc)
- * @param p1 Additional data for the command (see #CommandProc)
- * @param p2 Additional data for the command (see #CommandProc)
- * @param cmd The command to execute (a CMD_* value)
- * @param callback A callback function to call after the command is finished
- * @param text The text to pass
- * @param my_cmd indicator if the command is from a company or server (to display error messages for a user)
- * @return \c true if the command succeeded, else \c false.
- */
-bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback, const char *text, bool my_cmd)
+bool DoCommandP_NoConfirm(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback, const char *text, bool my_cmd)
 {
 	/* Cost estimation is generally only done when the
 	 * local user presses shift while doing somthing.
@@ -569,6 +558,77 @@ bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallbac
 	}
 
 	return res.Succeeded();
+}
+
+#if defined(USE_CONFIRM_COMMAND)
+/**
+ * Structure for buffering the build command when selecting a station to join.
+ */
+struct CommandStorage {
+	TileIndex tile;                  ///< tile command being executed on.
+	uint32 p1;                       ///< parameter p1.
+	uint32 p2;                       ///< parameter p2.
+	uint32 cmd;                      ///< command being executed.
+	CommandCallback *callback;       ///< any callback function executed upon successful completion of the command.
+	char *text;                      ///< possible text sent for name changes etc, in bytes including '\0'.
+};
+
+static void CommandConfirmCallback(Window *w, bool confirmed, void *param)
+{
+	CommandStorage *command = (CommandStorage *)param;
+	if (command) {
+		if (confirmed) DoCommandP_NoConfirm(command->tile, command->p1, command->p2, command->cmd, command->callback, command->text, true);
+		if (command->text)
+			free(command->text);
+		delete command;
+	}
+}
+#endif
+
+/*!
+ * Toplevel network safe docommand function for the current company. Must not be called recursively.
+ * The callback is called when the command succeeded or failed. The parameters
+ * \a tile, \a p1, and \a p2 are from the #CommandProc function. The parameter \a cmd is the command to execute.
+ * The parameter \a my_cmd is used to indicate if the command is from a company or the server.
+ *
+ * @param tile The tile to perform a command on (see #CommandProc)
+ * @param p1 Additional data for the command (see #CommandProc)
+ * @param p2 Additional data for the command (see #CommandProc)
+ * @param cmd The command to execute (a CMD_* value)
+ * @param callback A callback function to call after the command is finished
+ * @param text The text to pass
+ * @param my_cmd indicator if the command is from a company or server (to display error messages for a user)
+ * @return \c true if the command succeeded, else \c false.
+ */
+bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback, const char *text, bool my_cmd)
+{
+#if defined(USE_CONFIRM_COMMAND)
+	uint32 cmdtype = (cmd & 0xffffU);
+	if (my_cmd && (cmdtype < CMD_BUILD_VEHICLE || cmdtype == CMD_BUILD_INDUSTRY || cmdtype == CMD_PLACE_SIGN)) {
+		CommandStorage *command = new CommandStorage();
+		command->tile = tile;
+		command->p1 = p1;
+		command->p2 = p2;
+		command->cmd = cmd;
+		command->callback = callback;
+		if (text)
+			command->text = strdup(text);
+		else
+			command->text = NULL;
+
+		ShowQuery(
+			STR_EMPTY,
+			STR_EMPTY,
+			NULL,
+			NULL,
+			CommandConfirmCallback,
+			command
+		);
+		return false; // We don't know if it succeeded, so for now, it failed.
+	} else
+
+#endif
+	return DoCommandP_NoConfirm(tile, p1, p2, cmd, callback, text, my_cmd);
 }
 
 

@@ -16,6 +16,10 @@
 #include "string_type.h"
 #include "strings_type.h"
 
+#if defined(__QNXNTO__)
+#define USE_CALLBACK_OBJECT
+#endif
+
 /** Flags used in ShowQueryString() call */
 enum QueryStringFlags {
 	QSF_NONE             =    0,
@@ -28,9 +32,16 @@ DECLARE_ENUM_AS_BIT_SET(QueryStringFlags)
 
 /** Callback procedure for the ShowQuery method. */
 typedef void QueryCallbackProc(Window*, bool);
+#if defined(USE_CALLBACK_OBJECT)
+typedef void QueryCallbackObjectProc(Window*, bool, void*);
+#endif
 
 void ShowQueryString(StringID str, StringID caption, uint max_len, Window *parent, CharSetFilter afilter, QueryStringFlags flags);
+#if defined(USE_CALLBACK_OBJECT)
+void ShowQuery(StringID caption, StringID message, Window *w, QueryCallbackProc *callback, QueryCallbackObjectProc *callback2 = 0, void *callbackObject = 0);
+#else
 void ShowQuery(StringID caption, StringID message, Window *w, QueryCallbackProc *callback);
+#endif
 
 /** The number of 'characters' on the on-screen keyboard. */
 static const uint OSK_KEYBOARD_ENTRIES = 50;

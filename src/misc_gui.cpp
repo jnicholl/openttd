@@ -957,11 +957,19 @@ void ShowQueryString(StringID str, StringID caption, uint maxsize, Window *paren
  */
 struct QueryWindow : public Window {
 	QueryCallbackProc *proc; ///< callback function executed on closing of popup. Window* points to parent, bool is true if 'yes' clicked, false otherwise
+#if defined(USE_CALLBACK_OBJECT)
+	QueryCallbackObjectProc *proc2;
+	void *procObject;        ///< a way of passing data to a callback
+#endif
 	uint64 params[10];       ///< local copy of _decode_parameters
 	StringID message;        ///< message shown for query window
 	StringID caption;        ///< title of window
 
+#if defined(USE_CALLBACK_OBJECT)
+	QueryWindow(const WindowDesc *desc, StringID caption, StringID message, Window *parent, QueryCallbackProc *callback, QueryCallbackObjectProc *callback2, void *callbackObject) : Window()
+#else
 	QueryWindow(const WindowDesc *desc, StringID caption, StringID message, Window *parent, QueryCallbackProc *callback) : Window()
+#endif
 	{
 		/* Create a backup of the variadic arguments to strings because it will be
 		 * overridden pretty often. We will copy these back for drawing */
@@ -969,6 +977,10 @@ struct QueryWindow : public Window {
 		this->caption = caption;
 		this->message = message;
 		this->proc    = callback;
+#if defined(USE_CALLBACK_OBJECT)
+		this->proc2 = callback2;
+		this->procObject = callbackObject;
+#endif
 
 		this->InitNested(desc, WN_CONFIRM_POPUP_QUERY);
 
@@ -979,6 +991,10 @@ struct QueryWindow : public Window {
 
 	~QueryWindow()
 	{
+#if defined(USE_CALLBACK_OBJECT)
+		if (this->proc2 != NULL) this->proc2(this->parent, false, this->procObject);
+		else
+#endif
 		if (this->proc != NULL) this->proc(this->parent, false);
 	}
 
@@ -1001,6 +1017,12 @@ struct QueryWindow : public Window {
 		if (widget != WID_Q_TEXT) return;
 
 		Dimension d = GetStringMultiLineBoundingBox(this->message, *size);
+#if defined(__QNXNTO__)
+		// JEREMY FIXME: Localize!
+		if (this->message == STR_EMPTY) {
+			d = GetStringMultiLineBoundingBox("Confirm?", *size);
+		}
+#endif
 		d.width += WD_FRAMETEXT_LEFT + WD_FRAMETEXT_RIGHT;
 		d.height += WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 		*size = d;
@@ -1010,6 +1032,13 @@ struct QueryWindow : public Window {
 	{
 		if (widget != WID_Q_TEXT) return;
 
+#if defined(__QNXNTO__)
+		// JEREMY FIXME: Localize!
+		if (this->message == STR_EMPTY) {
+			DrawStringMultiLine(r.left + WD_FRAMETEXT_LEFT, r.right - WD_FRAMETEXT_RIGHT, r.top + WD_FRAMERECT_TOP, r.bottom - WD_FRAMERECT_BOTTOM,
+					"Confirm?", TC_FROMSTRING, SA_CENTER);
+		} else
+#endif
 		DrawStringMultiLine(r.left + WD_FRAMETEXT_LEFT, r.right - WD_FRAMETEXT_RIGHT, r.top + WD_FRAMERECT_TOP, r.bottom - WD_FRAMERECT_BOTTOM,
 				this->message, TC_FROMSTRING, SA_CENTER);
 	}
@@ -1024,7 +1053,17 @@ struct QueryWindow : public Window {
 				Window *parent = this->parent;
 				/* Prevent the destructor calling the callback function */
 				this->proc = NULL;
+#if defined(USE_CALLBACK_OBJECT)
+				QueryCallbackObjectProc *proc2 = this->proc2;
+				this->proc2 = NULL;
+#endif
 				delete this;
+#if defined(USE_CALLBACK_OBJECT)
+				if (proc2 != NULL) {
+					proc2(parent, true, procObject);
+					proc2 = NULL;
+				} else
+#endif
 				if (proc != NULL) {
 					proc(parent, true);
 					proc = NULL;
@@ -1043,6 +1082,12 @@ struct QueryWindow : public Window {
 		switch (keycode) {
 			case WKC_RETURN:
 			case WKC_NUM_ENTER:
+#if defined(USE_CALLBACK_OBJECT)
+				if (this->proc2 != NULL) {
+					this->proc2(parent, true, this->procObject);
+					this->proc2 = NULL;
+				} else
+#endif
 				if (this->proc != NULL) {
 					this->proc(this->parent, true);
 					this->proc = NULL;
@@ -1086,7 +1131,11 @@ static const WindowDesc _query_desc(
  * the main window WC_MAIN_WINDOW
  * @param callback callback function pointer to set in the window descriptor
  */
+#if defined(USE_CALLBACK_OBJECT)
+void ShowQuery(StringID caption, StringID message, Window *parent, QueryCallbackProc *callback, QueryCallbackObjectProc *callback2, void *callbackObject)
+#else
 void ShowQuery(StringID caption, StringID message, Window *parent, QueryCallbackProc *callback)
+#endif
 {
 	if (parent == NULL) parent = FindWindowById(WC_MAIN_WINDOW, 0);
 
@@ -1095,11 +1144,19 @@ void ShowQuery(StringID caption, StringID message, Window *parent, QueryCallback
 		if (w->window_class != WC_CONFIRM_POPUP_QUERY) continue;
 
 		const QueryWindow *qw = (const QueryWindow *)w;
+#if defined(USE_CALLBACK_OBJECT)
+		if (qw->parent != parent || qw->proc != callback || qw->proc2 != callback2 || qw->procObject != callbackObject) continue;
+#else
 		if (qw->parent != parent || qw->proc != callback) continue;
+#endif
 
 		delete qw;
 		break;
 	}
 
+#if defined(USE_CALLBACK_OBJECT)
+	new QueryWindow(&_query_desc, caption, message, parent, callback, callback2, callbackObject);
+#else
 	new QueryWindow(&_query_desc, caption, message, parent, callback);
+#endif
 }

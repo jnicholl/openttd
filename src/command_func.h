@@ -15,6 +15,10 @@
 #include "command_type.h"
 #include "company_type.h"
 
+#ifdef __QNXNTO__
+#define USE_CONFIRM_COMMAND
+#endif
+
 /**
  * Define a default return value for a failed command.
  *
@@ -37,6 +41,9 @@ static const CommandCost CMD_ERROR = CommandCost(INVALID_STRING_ID);
 CommandCost DoCommand(TileIndex tile, uint32 p1, uint32 p2, DoCommandFlag flags, uint32 cmd, const char *text = NULL);
 CommandCost DoCommand(const CommandContainer *container, DoCommandFlag flags);
 
+#if defined(USE_CONFIRM_COMMAND)
+bool DoCommandP_NoConfirm(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback = NULL, const char *text = NULL, bool my_cmd = true);
+#endif
 bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallback *callback = NULL, const char *text = NULL, bool my_cmd = true);
 bool DoCommandP(const CommandContainer *container, bool my_cmd = true);
 
