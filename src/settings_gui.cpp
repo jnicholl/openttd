@@ -204,13 +204,6 @@ struct GameOptionsWindow : Window {
 
 		if (needReInit) {
 			this->ReInit();
-			// Re-center the window - FIXME: Should we only re-center it if it was centered?
-			if (width < _screen.width && height < _screen.height) {
-				this->SetDirty();
-				left = (_screen.width - width) >> 1;
-				top = (_screen.height - height) >> 1;
-				this->SetDirty();
-			}
 			return;
 		}
 

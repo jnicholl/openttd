@@ -2462,7 +2462,11 @@ enum MouseClick {
 	MC_DOUBLE_LEFT,
 	MC_HOVER,
 
+#if defined(__QNXNTO__)
+	MAX_OFFSET_DOUBLE_CLICK = 20,
+#else
 	MAX_OFFSET_DOUBLE_CLICK = 5,     ///< How much the mouse is allowed to move to call it a double click
+#endif
 	TIME_BETWEEN_DOUBLE_CLICK = 500, ///< Time between 2 left clicks before it becoming a double click, in ms
 	MAX_OFFSET_HOVER = 5,            ///< Maximum mouse movement before stopping a hover event.
 };
