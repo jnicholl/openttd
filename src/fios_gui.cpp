@@ -40,6 +40,11 @@ LoadCheckData _load_check_data;    ///< Data loaded from save during SL_LOAD_CHE
 static bool _fios_path_changed;
 static bool _savegame_sort_dirty;
 
+#ifdef __QNXNTO__
+#define ROW_COUNT 6
+#else
+#define ROW_COUNT 10
+#endif
 
 /**
  * Reset read data.
@@ -68,6 +73,58 @@ void LoadCheckData::Clear()
 	ClearGRFConfigList(&this->grfconfig);
 }
 
+#ifdef USE_SIMPLE_FIOS_GUI
+/** Load game/scenario with optional content download */
+static const NWidgetPart _nested_load_dialog_widgets[] = {
+	NWidget(NWID_HORIZONTAL),
+		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
+		NWidget(WWT_CAPTION, COLOUR_GREY, WID_SL_CAPTION),
+	EndContainer(),
+	/* File selection area */
+	NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_FILES_SEL),
+		NWidget(NWID_VERTICAL),
+			NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_BACKGROUND), SetFill(1, 0), SetResize(1, 0), EndContainer(),
+			NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+				NWidget(NWID_VERTICAL),
+					NWidget(NWID_HORIZONTAL),
+						NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SORT_BYNAME), SetDataTip(STR_SORT_BY_CAPTION_NAME, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0), SetResize(1, 0),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SORT_BYDATE), SetDataTip(STR_SORT_BY_CAPTION_DATE, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0), SetResize(1, 0),
+						EndContainer(),
+						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SL_HOME_BUTTON), SetMinimalSize(12, 12), SetDataTip(SPR_HOUSE_ICON, STR_SAVELOAD_HOME_BUTTON),
+					EndContainer(),
+					NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_FILE_BACKGROUND),
+						NWidget(NWID_HORIZONTAL),
+							NWidget(WWT_INSET, COLOUR_GREY, WID_SL_DRIVES_DIRECTORIES_LIST), SetFill(1, 1), SetPadding(2, 1, 2, 2),
+									SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, ROW_COUNT), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
+							NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SL_SCROLLBAR),
+						EndContainer(),
+						NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_CONTENT_DOWNLOAD_SEL),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_CONTENT_DOWNLOAD), SetResize(1, 0),
+									SetDataTip(STR_INTRO_ONLINE_CONTENT, STR_INTRO_TOOLTIP_ONLINE_CONTENT),
+						EndContainer(),
+					EndContainer(),
+				EndContainer(),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+
+	/* Selected details */
+	NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_DETAILS_SEL),
+		NWidget(WWT_PANEL, COLOUR_GREY),
+			NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SL_DETAILS), SetResize(1, 1), SetFill(1, 1),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_MISSING_NEWGRFS), SetDataTip(STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_BUTTON, STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_TOOLTIP), SetFill(1, 0), SetResize(1, 0),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_NEWGRF_INFO), SetDataTip(STR_INTRO_NEWGRF_SETTINGS, STR_NULL), SetFill(1, 0), SetResize(1, 0),
+			NWidget(NWID_HORIZONTAL),
+				NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_DETAILS_BACK), SetDataTip(STR_GOAL_QUESTION_BUTTON_PREVIOUS, STR_NULL), SetFill(1, 0), SetResize(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_LOAD_BUTTON), SetDataTip(STR_SAVELOAD_LOAD_BUTTON, STR_SAVELOAD_LOAD_TOOLTIP), SetFill(1, 0), SetResize(1, 0),
+				EndContainer(),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+};
+#else
 /** Load game/scenario with optional content download */
 static const NWidgetPart _nested_load_dialog_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
@@ -87,7 +144,7 @@ static const NWidgetPart _nested_load_dialog_widgets[] = {
 			NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_FILE_BACKGROUND),
 				NWidget(NWID_HORIZONTAL),
 					NWidget(WWT_INSET, COLOUR_GREY, WID_SL_DRIVES_DIRECTORIES_LIST), SetFill(1, 1), SetPadding(2, 1, 2, 2),
-							SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, 10), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
+							SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, ROW_COUNT), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
 					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SL_SCROLLBAR),
 				EndContainer(),
 				NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_CONTENT_DOWNLOAD_SEL),
@@ -109,6 +166,7 @@ static const NWidgetPart _nested_load_dialog_widgets[] = {
 		EndContainer(),
 	EndContainer(),
 };
+#endif
 
 /** Load heightmap with content download */
 static const NWidgetPart _nested_load_heightmap_dialog_widgets[] = {
@@ -128,7 +186,7 @@ static const NWidgetPart _nested_load_heightmap_dialog_widgets[] = {
 		NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_FILE_BACKGROUND),
 			NWidget(NWID_HORIZONTAL),
 				NWidget(WWT_INSET, COLOUR_GREY, WID_SL_DRIVES_DIRECTORIES_LIST), SetFill(1, 1), SetPadding(2, 1, 2, 2),
-						SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, 10), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
+						SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, ROW_COUNT), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
 				NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SL_SCROLLBAR),
 			EndContainer(),
 			NWidget(NWID_HORIZONTAL),
@@ -140,6 +198,55 @@ static const NWidgetPart _nested_load_heightmap_dialog_widgets[] = {
 	EndContainer(),
 };
 
+#ifdef USE_SIMPLE_FIOS_GUI
+/** Save game/scenario */
+static const NWidgetPart _nested_save_dialog_widgets[] = {
+	NWidget(NWID_HORIZONTAL),
+		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
+		NWidget(WWT_CAPTION, COLOUR_GREY, WID_SL_CAPTION),
+	EndContainer(),
+	/* File selection area */
+	NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_FILES_SEL),
+		NWidget(NWID_VERTICAL),
+			NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_BACKGROUND), SetFill(1, 0), SetResize(1, 0), EndContainer(),
+			NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+				NWidget(NWID_VERTICAL),
+					NWidget(NWID_HORIZONTAL),
+						NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SORT_BYNAME), SetDataTip(STR_SORT_BY_CAPTION_NAME, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0), SetResize(1, 0),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SORT_BYDATE), SetDataTip(STR_SORT_BY_CAPTION_DATE, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0), SetResize(1, 0),
+						EndContainer(),
+						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SL_HOME_BUTTON), SetMinimalSize(12, 12), SetDataTip(SPR_HOUSE_ICON, STR_SAVELOAD_HOME_BUTTON),
+					EndContainer(),
+					NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_FILE_BACKGROUND),
+						NWidget(NWID_HORIZONTAL),
+							NWidget(WWT_INSET, COLOUR_GREY, WID_SL_DRIVES_DIRECTORIES_LIST), SetFill(1, 1), SetPadding(2, 1, 2, 2),
+									SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, ROW_COUNT), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
+							NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SL_SCROLLBAR),
+						EndContainer(),
+						NWidget(WWT_EDITBOX, COLOUR_GREY, WID_SL_SAVE_OSK_TITLE), SetPadding(3, 2, 2, 2), SetFill(1, 0), SetResize(1, 0),
+								SetDataTip(STR_SAVELOAD_OSKTITLE, STR_SAVELOAD_EDITBOX_TOOLTIP),
+					EndContainer(),
+				EndContainer(),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+
+	/* Selected details */
+	NWidget(NWID_SELECTION, INVALID_COLOUR, WID_SL_DETAILS_SEL),
+		NWidget(WWT_PANEL, COLOUR_GREY),
+			NWidget(WWT_EMPTY, INVALID_COLOUR, WID_SL_DETAILS), SetResize(1, 1), SetFill(1, 1),
+			NWidget(NWID_HORIZONTAL),
+				NWidget(NWID_HORIZONTAL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_DETAILS_BACK), SetDataTip(STR_GOAL_QUESTION_BUTTON_PREVIOUS, STR_NULL), SetFill(1, 0), SetResize(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_DELETE_SELECTION), SetDataTip(STR_SAVELOAD_DELETE_BUTTON, STR_SAVELOAD_DELETE_TOOLTIP), SetFill(1, 0), SetResize(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SL_SAVE_GAME),        SetDataTip(STR_SAVELOAD_SAVE_BUTTON, STR_SAVELOAD_SAVE_TOOLTIP),     SetFill(1, 0), SetResize(1, 0),
+				EndContainer(),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+};
+#else
 /** Save game/scenario */
 static const NWidgetPart _nested_save_dialog_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
@@ -159,7 +266,7 @@ static const NWidgetPart _nested_save_dialog_widgets[] = {
 			NWidget(WWT_PANEL, COLOUR_GREY, WID_SL_FILE_BACKGROUND),
 				NWidget(NWID_HORIZONTAL),
 					NWidget(WWT_INSET, COLOUR_GREY, WID_SL_DRIVES_DIRECTORIES_LIST), SetPadding(2, 1, 0, 2),
-							SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, 10), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
+							SetDataTip(0x0, STR_SAVELOAD_LIST_TOOLTIP), SetResize(1, ROW_COUNT), SetScrollbar(WID_SL_SCROLLBAR), EndContainer(),
 					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SL_SCROLLBAR),
 				EndContainer(),
 				NWidget(WWT_EDITBOX, COLOUR_GREY, WID_SL_SAVE_OSK_TITLE), SetPadding(3, 2, 2, 2), SetFill(1, 0), SetResize(1, 0),
@@ -179,6 +286,7 @@ static const NWidgetPart _nested_save_dialog_widgets[] = {
 		EndContainer(),
 	EndContainer(),
 };
+#endif
 
 /** Colours for fios types, indexed by #FiosType. */
 const TextColour _fios_colours[] = {
@@ -234,6 +342,10 @@ private:
 	FiosItem o_dir;
 	const FiosItem *selected;
 	Scrollbar *vscroll;
+#if defined(USE_SIMPLE_FIOS_GUI)
+	int state;
+	int maxState;
+#endif
 public:
 
 	/** Generate a default save filename. */
@@ -244,6 +356,9 @@ public:
 	}
 
 	SaveLoadWindow(const WindowDesc *desc, SaveLoadDialogMode mode) : filename_editbox(64)
+#if defined(USE_SIMPLE_FIOS_GUI)
+		, state(0), maxState(1)
+#endif
 	{
 		static const StringID saveload_captions[] = {
 			STR_SAVELOAD_LOAD_CAPTION,
@@ -369,7 +484,16 @@ public:
 			case WID_SL_DETAILS: {
 				GfxFillRect(r.left + WD_FRAMERECT_LEFT, r.top + WD_FRAMERECT_TOP,
 						r.right - WD_FRAMERECT_RIGHT, r.top + FONT_HEIGHT_NORMAL * 2 + WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM, PC_GREY);
+#if defined(USE_SIMPLE_FIOS_GUI)
+				if (this->selected == NULL)
+					DrawString(r.left, r.right, r.top + FONT_HEIGHT_NORMAL / 2 + WD_FRAMERECT_TOP, STR_SAVELOAD_DETAIL_CAPTION, TC_FROMSTRING, SA_HOR_CENTER);
+				else {
+					DrawString(r.left, r.right, r.top + WD_FRAMERECT_TOP, STR_SAVELOAD_DETAIL_CAPTION, TC_FROMSTRING, SA_HOR_CENTER);
+					DrawString(r.left, r.right, r.top + FONT_HEIGHT_NORMAL + WD_FRAMERECT_TOP, this->selected->title, TC_BLACK, SA_HOR_CENTER);
+				}
+#else
 				DrawString(r.left, r.right, r.top + FONT_HEIGHT_NORMAL / 2 + WD_FRAMERECT_TOP, STR_SAVELOAD_DETAIL_CAPTION, TC_FROMSTRING, SA_HOR_CENTER);
+#endif
 
 				if (this->selected == NULL) break;
 
@@ -466,12 +590,21 @@ public:
 	{
 		switch (widget) {
 			case WID_SL_BACKGROUND:
+#if defined(USE_SIMPLE_FIOS_GUI)
+				size->width = 350;
+#endif
 				size->height = 2 * FONT_HEIGHT_NORMAL + WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 				break;
 
+#if defined(USE_SIMPLE_FIOS_GUI)
+			case WID_SL_DETAILS:
+				size->width = 350;
+				break;
+#endif
+
 			case WID_SL_DRIVES_DIRECTORIES_LIST:
 				resize->height = FONT_HEIGHT_NORMAL;
-				size->height = resize->height * 10 + WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
+				size->height = resize->height * ROW_COUNT + WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 				break;
 			case WID_SL_SORT_BYNAME:
 			case WID_SL_SORT_BYDATE: {
@@ -486,6 +619,34 @@ public:
 
 	virtual void OnPaint()
 	{
+		NWidgetStacked *stackedPanels[2];
+		stackedPanels[0] = this->GetWidget<NWidgetStacked>(WID_SL_FILES_SEL);
+		if (stackedPanels[0]) {
+			stackedPanels[1] = this->GetWidget<NWidgetStacked>(WID_SL_DETAILS_SEL);
+			bool needReInit = false;
+			for (int i=0; i<=this->maxState; i++) {
+				if (i == this->state && 0 != stackedPanels[i]->shown_plane) {
+					stackedPanels[i]->SetDisplayedPlane(0);
+					needReInit = true;
+				} else if (i != this->state && SZSP_NONE != stackedPanels[i]->shown_plane) {
+					stackedPanels[i]->SetDisplayedPlane(SZSP_NONE);
+					needReInit = true;
+				}
+			}
+
+			if (needReInit) {
+				this->ReInit();
+				// Re-center the window - FIXME: Should we only re-center it if it was centered?
+				if (width < _screen.width && height < _screen.height) {
+					this->SetDirty();
+					left = (_screen.width - width) >> 1;
+					top = (_screen.height - height) >> 1;
+					this->SetDirty();
+				}
+				return;
+			}
+		}
+
 		if (_savegame_sort_dirty) {
 			_savegame_sort_dirty = false;
 			MakeSortedSaveGameList();
@@ -547,6 +708,14 @@ public:
 				}
 				break;
 
+#if defined(USE_SIMPLE_FIOS_GUI)
+			case WID_SL_DETAILS_BACK:
+				this->state = 0;
+				this->selected = NULL;
+				this->InvalidateData(1);
+				break;
+#endif
+
 			case WID_SL_DRIVES_DIRECTORIES_LIST: { // Click the listbox
 				int y = this->vscroll->GetScrolledRowFromWidget(pt.y, this, WID_SL_DRIVES_DIRECTORIES_LIST, WD_FRAMERECT_TOP);
 				if (y == INT_MAX) return;
@@ -562,6 +731,9 @@ public:
 
 							if (file->type == FIOS_TYPE_FILE || file->type == FIOS_TYPE_SCENARIO) {
 								SaveOrLoad(name, SL_LOAD_CHECK, NO_DIRECTORY, false);
+#if defined(USE_SIMPLE_FIOS_GUI)
+								this->state = 1;
+#endif
 							}
 
 							this->InvalidateData(1);

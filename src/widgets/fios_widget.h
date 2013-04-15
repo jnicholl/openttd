@@ -12,6 +12,10 @@
 #ifndef WIDGETS_FIOS_WIDGET_H
 #define WIDGETS_FIOS_WIDGET_H
 
+#ifdef __QNXNTO__
+#define USE_SIMPLE_FIOS_GUI
+#endif
+
 /** Widgets of the #SaveLoadWindow class. */
 enum SaveLoadWidgets {
 	WID_SL_CAPTION,                 ///< Caption of the window.
@@ -31,6 +35,11 @@ enum SaveLoadWidgets {
 	WID_SL_NEWGRF_INFO,             ///< Button to open NewGgrf configuration.
 	WID_SL_LOAD_BUTTON,             ///< Button to load game/scenario.
 	WID_SL_MISSING_NEWGRFS,         ///< Button to find missing NewGRFs online.
+#if defined(USE_SIMPLE_FIOS_GUI)
+	WID_SL_FILES_SEL,               ///< Selection that shows files
+	WID_SL_DETAILS_SEL,             ///< Selection that shows details for selected file
+	WID_SL_DETAILS_BACK,            ///< Go back to file selection
+#endif
 };
 
 #endif /* WIDGETS_FIOS_WIDGET_H */
