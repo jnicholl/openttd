@@ -78,6 +78,9 @@ extern Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMP
 extern void ShowOSErrorBox(const char *buf, bool system);
 extern char *_config_file;
 
+#if defined(__QNXNTO__)
+void ForceInitMusicDriver_Timidity();
+#endif
 /**
  * Error handling for fatal user errors.
  * @param s the string to print.
@@ -812,6 +815,10 @@ int ttd_main(int argc, char *argv[])
 		}
 	}
 	free(music_set);
+
+#if defined(__QNXNTO__)
+	ForceInitMusicDriver_Timidity();
+#endif
 
 	if (sounddriver == NULL && _ini_sounddriver != NULL) sounddriver = strdup(_ini_sounddriver);
 	_sound_driver = (SoundDriver*)SoundDriverFactoryBase::SelectDriver(sounddriver, Driver::DT_SOUND);

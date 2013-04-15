@@ -22,4 +22,10 @@ void MxSetChannelRawSrc(MixerChannel *mc, int8 *mem, size_t size, uint rate, boo
 void MxSetChannelVolume(MixerChannel *mc, uint volume, float pan);
 void MxActivateChannel(MixerChannel*);
 
+#if defined(__QNXNTO__)
+MixerChannel *MxAllocateMusicChannel(void (*callback)(int16*,uint));
+void MxMixMusic(int16* buffer, uint samples, const int16 *music);
+void MxDeactivateMusic();
+#endif
+
 #endif /* MIXER_H */
