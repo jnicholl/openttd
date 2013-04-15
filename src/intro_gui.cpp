@@ -124,7 +124,6 @@ struct SelectGameWindow : public Window {
 			case WID_SGI_PLAY_SCENARIO:  ShowSaveLoadDialog(SLD_LOAD_SCENARIO); break;
 			case WID_SGI_PLAY_HEIGHTMAP: ShowSaveLoadDialog(SLD_LOAD_HEIGHTMAP); break;
 			case WID_SGI_EDIT_SCENARIO:  StartScenarioEditor(); break;
-#endif
 
 			case WID_SGI_PLAY_NETWORK:
 				if (!_network_available) {
@@ -133,6 +132,7 @@ struct SelectGameWindow : public Window {
 					ShowNetworkGameWindow();
 				}
 				break;
+#endif
 
 			case WID_SGI_TEMPERATE_LANDSCAPE: case WID_SGI_ARCTIC_LANDSCAPE:
 			case WID_SGI_TROPIC_LANDSCAPE: case WID_SGI_TOYLAND_LANDSCAPE:
@@ -169,9 +169,6 @@ static const NWidgetPart _nested_select_game_widgets[] = {
 						SetDataTip(STR_INTRO_NEW_GAME, STR_INTRO_TOOLTIP_NEW_GAME), SetPadding(0, 10, 6, 10), SetFill(1, 0),
 	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_LOAD_GAME), SetMinimalSize(158, 16),
 						SetDataTip(STR_INTRO_LOAD_GAME, STR_INTRO_TOOLTIP_LOAD_GAME), SetPadding(0, 10, 6, 10), SetFill(1, 0),
-	NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_SGI_PLAY_NETWORK), SetMinimalSize(158, 16),
-						SetDataTip(STR_INTRO_MULTIPLAYER, STR_INTRO_TOOLTIP_MULTIPLAYER), SetPadding(0, 10, 7, 10), SetFill(1, 0),
-
 
 	/* climate selection buttons */
 	NWidget(NWID_HORIZONTAL),
