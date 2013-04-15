@@ -34,6 +34,10 @@
 #include "error.h"
 #include "game/game.hpp"
 
+#if defined(__QNXNTO__)
+#include <bps/virtualkeyboard.h>
+#endif
+
 /** Values for _settings_client.gui.auto_scrolling */
 enum ViewportAutoscrolling {
 	VA_DISABLED,                  //!< Do not autoscroll when mouse is at edge of viewport.
@@ -312,6 +316,12 @@ bool Window::SetFocusedWidget(int widget_index)
 	assert(this->nested_array[widget_index] != NULL); // Setting focus to a non-existing widget is a bad idea.
 	if (this->nested_focus != NULL) {
 		if (this->GetWidget<NWidgetCore>(widget_index) == this->nested_focus) return false;
+
+#if defined(__QNXNTO__)
+		if ((this->nested_focus->type & WWT_MASK) == WWT_EDITBOX) {
+			virtualkeyboard_hide();
+		}
+#endif
 
 		/* Repaint the widget that lost focus. A focused edit box may else leave the caret on the screen. */
 		this->nested_focus->SetDirty(this);

@@ -26,6 +26,10 @@
 #include "core/geometry_func.hpp"
 #include "newgrf_debug.h"
 
+#if defined(__QNXNTO__)
+#include <bps/virtualkeyboard.h>
+#endif
+
 #include "widgets/misc_widget.h"
 
 #include "table/strings.h"
@@ -804,12 +808,19 @@ void QueryString::ClickEditBox(Window *w, Point pt, int wid, int click_count, bo
 		return;
 	}
 
+#if defined(__QNXNTO__)
+	// JEREMY: FIXME: Hack to show the VKB only on Z10.
+	if (_screen.width >= 450 && _screen.height >= 450) {
+		virtualkeyboard_show();
+	}
+#else
 	if (w->window_class != WC_OSK && _settings_client.gui.osk_activation != OSKA_DISABLED &&
 		(!focus_changed || _settings_client.gui.osk_activation == OSKA_IMMEDIATELY) &&
 		(click_count == 2 || _settings_client.gui.osk_activation != OSKA_DOUBLE_CLICK)) {
 		/* Open the OSK window */
 		ShowOnScreenKeyboard(w, wid);
 	}
+#endif
 }
 
 /** Class for the string query window. */
