@@ -30,7 +30,7 @@
 #include "table/strings.h"
 
 #ifdef __QNXNTO__
-#define USE_CONFIRM_COMMAND
+//#define USE_CONFIRM_COMMAND
 #endif
 
 #if defined(USE_CONFIRM_COMMAND)

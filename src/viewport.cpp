@@ -49,6 +49,14 @@
 #include "table/strings.h"
 #include "table/palettes.h"
 
+#ifdef __QNXNTO__
+#define USE_CONFIRM_PLACEMENT
+#endif
+
+#if defined(USE_CONFIRM_PLACEMENT)
+#include "textbuf_gui.h"
+#endif
+
 Point _tile_fract_coords;
 
 struct StringSpriteToDraw {
@@ -2093,6 +2101,7 @@ void TileHighlightData::Reset()
 	this->pos.y = 0;
 	this->new_pos.x = 0;
 	this->new_pos.y = 0;
+	this->waiting_modal = false;
 }
 
 /**
@@ -2124,6 +2133,8 @@ Window *TileHighlightData::GetCallbackWnd()
  */
 void UpdateTileSelection()
 {
+	if (_thd.waiting_modal) return;
+
 	int x1;
 	int y1;
 
@@ -2297,6 +2308,8 @@ void VpSetPresizeRange(TileIndex from, TileIndex to)
 
 static void VpStartPreSizing()
 {
+	if (_thd.waiting_modal) return;
+
 	_thd.selend.x = -1;
 	_special_mouse_mode = WSM_PRESIZE;
 }
@@ -2870,12 +2883,38 @@ calc_heightdiff_single_direction:;
 	_thd.selend.y = y;
 }
 
+#if defined(USE_CONFIRM_PLACEMENT)
+static void VpHandlePlaceSizingDragFinish(Window *, bool confirm)
+{
+	Window *w = _thd.GetCallbackWnd();
+	/* mouse button released..
+	 * keep the selected tool, but reset it to the original mode. */
+	_special_mouse_mode = WSM_NONE;
+	HighLightStyle others = _thd.place_mode & ~(HT_DRAG_MASK | HT_DIR_MASK);
+	if ((_thd.next_drawstyle & HT_DRAG_MASK) == HT_RECT) {
+		_thd.place_mode = HT_RECT | others;
+	} else if (_thd.select_method & VPM_SIGNALDIRS) {
+		_thd.place_mode = HT_RECT | others;
+	} else if (_thd.select_method & VPM_RAILDIRS) {
+		_thd.place_mode = (_thd.select_method & ~VPM_RAILDIRS) ? _thd.next_drawstyle : (HT_RAIL | others);
+	} else {
+		_thd.place_mode = HT_POINT | others;
+	}
+	SetTileSelectSize(1, 1);
+
+	if (confirm)
+		w->OnPlaceMouseUp(_thd.select_method, _thd.select_proc, _thd.selend, TileVirtXY(_thd.selstart.x, _thd.selstart.y), TileVirtXY(_thd.selend.x, _thd.selend.y));
+	_thd.waiting_modal = false;
+}
+#endif
+
 /**
  * Handle the mouse while dragging for placement/resizing.
  * @return State of handling the event.
  */
 EventState VpHandlePlaceSizingDrag()
 {
+	if (_thd.waiting_modal) return ES_NOT_HANDLED;
 	if (_special_mouse_mode != WSM_SIZING) return ES_NOT_HANDLED;
 
 	/* stop drag mode if the window has been closed */
@@ -2891,6 +2930,17 @@ EventState VpHandlePlaceSizingDrag()
 		return ES_HANDLED;
 	}
 
+#if defined(USE_CONFIRM_PLACEMENT)
+	_thd.waiting_modal = true;
+	ShowQuery(
+		STR_EMPTY,
+		STR_EMPTY,
+		w,
+		VpHandlePlaceSizingDragFinish
+	);
+
+	return ES_NOT_HANDLED;
+#else
 	/* mouse button released..
 	 * keep the selected tool, but reset it to the original mode. */
 	_special_mouse_mode = WSM_NONE;
@@ -2909,6 +2959,7 @@ EventState VpHandlePlaceSizingDrag()
 	w->OnPlaceMouseUp(_thd.select_method, _thd.select_proc, _thd.selend, TileVirtXY(_thd.selstart.x, _thd.selstart.y), TileVirtXY(_thd.selend.x, _thd.selend.y));
 
 	return ES_HANDLED;
+#endif
 }
 
 void SetObjectToPlaceWnd(CursorID icon, PaletteID pal, HighLightStyle mode, Window *w)

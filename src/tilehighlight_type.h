@@ -74,6 +74,8 @@ struct TileHighlightData {
 	ViewportPlaceMethod select_method;            ///< The method which governs how tiles are selected.
 	ViewportDragDropSelectionProcess select_proc; ///< The procedure that has to be called when the selection is done.
 
+	bool waiting_modal;
+
 	void Reset();
 
 	bool IsDraggingDiagonal();
