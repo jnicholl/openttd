@@ -2134,7 +2134,7 @@ static EventState HandleScrollbarScrolling()
 
 #if defined(USE_TOUCH_SCROLLING)
 			if (w->touch_scroll) {
-				i = -i;
+				i = -i * sb->GetCapacity() / sb->GetCount();
 			}
 #endif
 
