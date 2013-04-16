@@ -29,6 +29,10 @@
 
 #include "table/strings.h"
 
+#ifdef __QNXNTO__
+#define USE_CONFIRM_COMMAND
+#endif
+
 #if defined(USE_CONFIRM_COMMAND)
 #include "textbuf_gui.h"
 #endif
